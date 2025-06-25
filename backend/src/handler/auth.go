@@ -2,6 +2,7 @@ package handler
 
 import (
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -11,6 +12,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/r-happy/yukikaki-system/src/model"
 )
+
+// jwt関連のヘルパー関数 //
+// TokenからUserを返す。
+func UserFromToken(c echo.Context) (*model.User, error) {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*JwtCustomClaims)
+	userId := claims.UserId
+
+	result, _ := model.FindUserByUserID(userId)
+	if result == nil {
+		return nil, errors.New("User not found")
+	}
+
+	return result, nil
+}
 
 // jwtの設定 //
 type JwtCustomClaims struct {

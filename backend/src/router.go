@@ -34,7 +34,7 @@ func newRouter() *echo.Echo {
 	r.Use(echojwt.WithConfig(config))
 
 	// api routes
-	r.GET("/test", func(c echo.Context) error { return c.JSON(http.StatusOK, "valid jwt") })
+	r.GET("/user", handler.GetUser)
 
 	return e
 }
