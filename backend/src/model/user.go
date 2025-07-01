@@ -31,6 +31,10 @@ func CreateUser(user *User) error {
 		return errors.New("invalid email")
 	}
 
+	if u, _ := FindUserByUserEmail(user.UserEmail); u != nil {
+		return errors.New("Emails is already used")
+	}
+
 	r := db.Create(user)
 
 	if r.Error != nil {

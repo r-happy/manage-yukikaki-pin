@@ -12,7 +12,7 @@ func GetUser(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, "User not found")
 	}
 
-	// user.UserPassword = ""
+	user.UserPassword = ""
 
 	return c.JSON(http.StatusOK, user)
 }

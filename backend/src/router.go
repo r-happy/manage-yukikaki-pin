@@ -33,7 +33,7 @@ func newRouter() *echo.Echo {
 	}
 	r.Use(echojwt.WithConfig(config))
 
-	// api routes
+	// api routes with jwt middleware
 	r.GET("/user", handler.GetUser)
 
 	return e
