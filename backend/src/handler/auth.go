@@ -25,6 +25,8 @@ func UserFromToken(c echo.Context) (*model.User, error) {
 		return nil, errors.New("User not found")
 	}
 
+	result.UserPassword = ""
+
 	return result, nil
 }
 
@@ -50,7 +52,7 @@ func SignUp(c echo.Context) error {
 	}
 	// すべてのフィールドが埋まってるかどうか
 	if err := ValidateStruct(req); err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	createdUserID := uuid.New()
@@ -85,7 +87,7 @@ func SignIn(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Invalid Request")
 	}
 	if err := ValidateStruct(req); err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	// 認証処理

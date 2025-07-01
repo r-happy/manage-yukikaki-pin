@@ -36,5 +36,9 @@ func newRouter() *echo.Echo {
 	// api routes with jwt middleware
 	r.GET("/user", handler.GetUser)
 
+	// group
+	r.POST("/g", handler.AddGroup)
+	r.GET("/g", handler.GetGroup)
+
 	return e
 }

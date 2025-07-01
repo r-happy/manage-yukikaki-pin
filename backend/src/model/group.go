@@ -10,8 +10,9 @@ type Group struct {
 	GroupID          uuid.UUID `json:"group_id" gorm:"primaryKey"`
 	GroupName        string    `json:"group_name"`
 	GroupDescription string    `json:"group_description"`
+	GroupCreatedByID uuid.UUID `json:"group_created_by_id" gorm:"foreignKey:GroupCreatedByID"`
 	GroupCreatedBy   User      `json:"group_created_by" gorm:"references:UserID"`
-	CreatedAt        time.Time `json:"createad_at"`
+	CreatedAt        time.Time `json:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at"`
 	DeletedAt        time.Time `json:"deleted_at"`
 }
@@ -32,7 +33,7 @@ func CreateGroup(group *Group) error {
 // GroupIDを用いてGroupを探す
 func FindGroupByGroupID(group_id uuid.UUID) (*Group, error) {
 	var group Group
-	r := db.Where("group_id = ?", group_id).First(&group)
+	r := db.Preload("GroupCreatedBy").Where("group_id = ?", group_id).First(&group)
 	if r.Error != nil {
 		return nil, r.Error
 	}
