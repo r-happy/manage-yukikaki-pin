@@ -1,9 +1,7 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
-	"strings"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -13,30 +11,13 @@ import (
 // AddGroupMember //
 // AddGroupMemberリクエストに必要な型
 type AddGroupMemberRequest struct {
-	GroupID    string `json:"group_id" binding:"required"`
-	UserIDs    string `json:"user_id" binding:"required"`
-	NotAllowed bool   `json:"not_allowed"`
-}
-
-func AddGroupMemberByUserIDsWithAllowed(groupID uuid.UUID, userIDs string) error {
-	// UserIDsをカンマ区切りで分割し、各ユーザーIDを検証し追加
-	for userID := range strings.SplitSeq(userIDs, ",") {
-		groupMember := &model.GroupMember{
-			GroupMemberID: uuid.New(),
-			GroupID:       groupID,
-			UserID:        uuid.MustParse(userID),
-			NotAllowed:    false,
-		}
-
-		if err := model.CreateGroupMember(groupMember); err != nil {
-			return errors.New("Failed to add group member: " + err.Error())
-		}
-	}
-	return nil
+	GroupID string `json:"group_id" binding:"required"`
+	UserIDs string `json:"user_id" binding:"required"`
+	Admin   bool   `json:"admin" binding:"required"`
 }
 
 // AddGroupMemberのメイン処理
-func AddGroupMember(c echo.Context) error {
+func AddGroupMemberByAdmin(c echo.Context) error {
 	req := new(AddGroupMemberRequest)
 	if err := c.Bind(req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
@@ -54,8 +35,17 @@ func AddGroupMember(c echo.Context) error {
 	}
 	user.UserPassword = ""
 
+	// Adminかどうか
+	isAdmin, err := model.IsAdminOfGropMember(uuid.MustParse(req.GroupID), user.UserID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Error checking admin status: "+err.Error())
+	}
+	if !isAdmin {
+		return c.JSON(http.StatusForbidden, "You are not an admin of this group")
+	}
+
 	// groupMemberを追加
-	if err := AddGroupMemberByUserIDsWithAllowed(uuid.MustParse(req.GroupID), req.UserIDs); err != nil {
+	if err := model.AddGroupMemberByUserIDsWithAllowed(uuid.MustParse(req.GroupID), req.UserIDs, req.Admin); err != nil {
 		return c.JSON(http.StatusInternalServerError, "Error adding group members: "+err.Error())
 	}
 

@@ -21,7 +21,7 @@ func newRouter() *echo.Echo {
 	// Public routes
 	e.GET("/", func(c echo.Context) error { return c.JSON(http.StatusOK, "Hello world") })
 	e.POST("/signup", handler.SignUp)
-	e.GET("/signin", handler.SignIn)
+	e.POST("/signin", handler.SignIn)
 
 	// jwt middleware
 	r := e.Group("/api")
@@ -34,11 +34,16 @@ func newRouter() *echo.Echo {
 	r.Use(echojwt.WithConfig(config))
 
 	// api routes with jwt middleware
-	r.GET("/user", handler.GetUser)
+	r.GET("/me", handler.GetUser)
+	r.GET("/me/groups", handler.GetGroupsByUser)
 
 	// group
-	r.POST("/g", handler.AddGroup)
-	r.GET("/g", handler.GetGroup)
+	r.POST("/groups", handler.AddGroup)
+	r.GET("/groups/:groupID", handler.GetGroup)
+
+	// group member
+	r.POST("/groups/:groupID/add-members", handler.AddGroupMemberByAdmin)
+	r.POST("/groups/:groupID/join-requests", handler.AddGroupMemberByAdmin)
 
 	return e
 }

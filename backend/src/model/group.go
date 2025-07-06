@@ -49,3 +49,20 @@ func FindGroupByGroupCreatedBy(user *User) ([]Group, error) {
 	}
 	return groups, nil
 }
+
+// GroupID + UserIDでGroupを探す
+func FindGroupByGroupIDAndUserID(group_id uuid.UUID, user_id uuid.UUID) (*Group, error) {
+	var group Group
+	groupMember, err := FindGroupMemberByGroupIDAndUserID(group_id, user_id)
+	if err != nil {
+		return nil, err
+	}
+	if groupMember == nil {
+		return nil, nil
+	}
+	r := db.Preload("GroupCreatedBy").Where("group_id = ?", group_id).First(&group)
+	if r.Error != nil {
+		return nil, r.Error
+	}
+	return &group, nil
+}
