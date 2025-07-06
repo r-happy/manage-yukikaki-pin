@@ -13,6 +13,7 @@ import (
 type addGroupRequest struct {
 	GroupName        string `form:"group_name"`
 	GroupDescription string `form:"group_description"`
+	UserIDs          string `form:"user_ids"` // カンマ区切りのユーザーID
 }
 
 // AddGroupのメイン処理
@@ -38,11 +39,16 @@ func AddGroup(c echo.Context) error {
 		GroupID:          uuid.New(),
 		GroupName:        req.GroupName,
 		GroupDescription: req.GroupDescription,
-		GroupCreatedBy:   *user,
+		GroupCreatedByID: user.UserID,
 	}
 
 	if err := model.CreateGroup(group); err != nil {
 		return c.JSON(http.StatusInternalServerError, "Error")
+	}
+
+	// GroupMemberの作成
+	if err := AddGroupMemberByUserIDsWithAllowed(group.GroupID, req.UserIDs); err != nil {
+		return c.JSON(http.StatusInternalServerError, "Error adding group members: "+err.Error())
 	}
 
 	return c.JSON(http.StatusOK, group)
