@@ -28,6 +28,11 @@ func CreateGroupMember(groupMember *GroupMember) error {
 	if u, _ := FindUserByUserID(groupMember.UserID); u == nil {
 		return errors.New("User not found")
 	}
+	// すでに同じグループに同じユーザーが存在するか確認
+	existingMember, _ := FindGroupMemberByGroupIDAndUserID(groupMember.GroupID, groupMember.UserID)
+	if existingMember != nil {
+		return errors.New("User is already a member of this group")
+	}
 
 	r := db.Create(groupMember)
 
@@ -100,10 +105,44 @@ func FindGroupMemberByGroupIDAndUserID(group_id uuid.UUID, user_id uuid.UUID) (*
 	return &groupMember, nil
 }
 
+// 自分が所属しているグループのすべてのGroupMemberを探す
+func FindAllGroupMemberByUserID(user_id uuid.UUID) ([]GroupMember, error) {
+	var groupIDs []uuid.UUID
+	if err := db.Model(&GroupMember{}).
+		Where("user_id = ? AND not_allowed = ?", user_id, false).
+		Pluck("group_id", &groupIDs).Error; err != nil {
+		return nil, err
+	}
+	if len(groupIDs) == 0 {
+		return []GroupMember{}, nil
+	}
+
+	var allGroupMembers []GroupMember
+	if err := db.Preload("User").
+		Where("group_id IN ?", groupIDs).
+		Find(&allGroupMembers).Error; err != nil {
+		return nil, err
+	}
+	return allGroupMembers, nil
+}
+
 // UserID + GroupIDでAdminかどうかを確認する関数
 func IsAdminOfGropMember(groupID uuid.UUID, userID uuid.UUID) (bool, error) {
 	var groupMember GroupMember
 	r := db.Where("group_id = ? AND user_id = ? AND admin = ?", groupID, userID, true).First(&groupMember)
+	if r.Error != nil {
+		if r.Error.Error() == "record not found" {
+			return false, nil
+		}
+		return false, r.Error
+	}
+	return true, nil
+}
+
+// Userがグループに所属しているかどうかを確認する関数
+func IsMemberOfGroup(groupID uuid.UUID, userID uuid.UUID) (bool, error) {
+	var groupMember GroupMember
+	r := db.Where("group_id = ? AND user_id = ? AND not_allowed = ?", groupID, userID, false).First(&groupMember)
 	if r.Error != nil {
 		if r.Error.Error() == "record not found" {
 			return false, nil

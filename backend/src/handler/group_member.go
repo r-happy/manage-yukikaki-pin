@@ -11,9 +11,8 @@ import (
 // AddGroupMember //
 // AddGroupMemberリクエストに必要な型
 type AddGroupMemberRequest struct {
-	GroupID string `json:"group_id" binding:"required"`
-	UserIDs string `json:"user_id" binding:"required"`
-	Admin   bool   `json:"admin" binding:"required"`
+	UserIDs string `form:"user_ids"`
+	Admin   bool   `form:"admin"`
 }
 
 // AddGroupMemberのメイン処理
@@ -28,6 +27,12 @@ func AddGroupMemberByAdmin(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
+	// groupIDを取得
+	groupIDstr := c.Param("groupID")
+	if groupIDstr == "" {
+		return c.JSON(http.StatusBadRequest, "Group ID is required")
+	}
+
 	// user認証
 	user, err := UserFromToken(c)
 	if err != nil {
@@ -36,7 +41,7 @@ func AddGroupMemberByAdmin(c echo.Context) error {
 	user.UserPassword = ""
 
 	// Adminかどうか
-	isAdmin, err := model.IsAdminOfGropMember(uuid.MustParse(req.GroupID), user.UserID)
+	isAdmin, err := model.IsAdminOfGropMember(uuid.MustParse(groupIDstr), user.UserID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "Error checking admin status: "+err.Error())
 	}
@@ -45,7 +50,7 @@ func AddGroupMemberByAdmin(c echo.Context) error {
 	}
 
 	// groupMemberを追加
-	if err := model.AddGroupMemberByUserIDsWithAllowed(uuid.MustParse(req.GroupID), req.UserIDs, req.Admin); err != nil {
+	if err := model.AddGroupMemberByUserIDsWithAllowed(uuid.MustParse(groupIDstr), req.UserIDs, req.Admin); err != nil {
 		return c.JSON(http.StatusInternalServerError, "Error adding group members: "+err.Error())
 	}
 

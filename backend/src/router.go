@@ -45,5 +45,13 @@ func newRouter() *echo.Echo {
 	r.POST("/groups/:groupID/add-members", handler.AddGroupMemberByAdmin)
 	r.POST("/groups/:groupID/join-requests", handler.AddGroupMemberByAdmin)
 
+	// pin type
+	r.POST("/groups/:groupID/pin-types", handler.AddPinType)
+	r.GET("/groups/:groupID/pin-types", handler.GetPinTypesByGroupID)
+
+	// pin
+	r.POST("/groups/:groupID/pins", handler.AddPinByMember)
+	r.GET("/groups/:groupID/pins", handler.GetPinsByGroupID)
+
 	return e
 }
