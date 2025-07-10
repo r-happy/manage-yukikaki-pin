@@ -1,0 +1,54 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.auth-wrapper {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+
+  .content {
+    background: #f8fafc;
+    padding: 1rem;
+    min-width: 320px;
+    max-width: 100%;
+    border: 1px solid #f1f5f9;
+    border-radius: 0.5rem;
+    display: grid;
+    gap: 0.5rem;
+
+    .title {
+      font-size: 1.2em;
+    }
+
+    form {
+      display: grid;
+      gap: 0.5rem;
+
+      input {
+        padding: 0.5rem;
+        border: 1px solid #f1f5f9;
+        border-radius: 0.25rem;
+
+        &:focus {
+          outline: none;
+          border-color: #51a2ff;
+        }
+      }
+
+      button {
+        padding: 0.5rem;
+        background: #51a2ff;
+        color: white;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+
+        &:hover {
+          background: darken(#51a2ff, 5%);
+        }
+      }
+    }
+  }
+}

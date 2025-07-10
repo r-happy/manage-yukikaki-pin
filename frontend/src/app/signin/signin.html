@@ -1,0 +1,14 @@
+<div class="auth-wrapper">
+    <div class="content">
+        <h1 class="title">
+            サインイン
+        </h1>
+        <div>
+            <form class="form" [formGroup]="signInForm" (ngSubmit)="onSubmit()">
+                <input type="email" formControlName="email" />
+                <input type="password" formControlName="password" />
+                <button type="submit">サインイン</button>
+            </form>
+        </div>
+    </div>
+</div>
