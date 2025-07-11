@@ -1,0 +1,35 @@
+.wrapper {
+  width: 100%;
+
+  header {
+    padding: 0.8em 0.5em;
+    position: sticky;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8fafc;
+    border-bottom: solid 1px #f1f5f9;
+
+    nav {
+      display: flex;
+      gap: 1em;
+
+      a {
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .title {
+      font-size: 1.2em;
+    }
+  }
+
+  main {
+    padding: 1em;
+  }
+}

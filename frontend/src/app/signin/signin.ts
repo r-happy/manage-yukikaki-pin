@@ -6,17 +6,18 @@ import {
   Validators,
 } from '@angular/forms';
 import { environment } from '../../environments/environment';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-signin',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './signin.html',
   styleUrl: './signin.scss',
 })
 export class Signin {
   signInForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.signInForm = this.fb.nonNullable.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
@@ -33,12 +34,19 @@ export class Signin {
         method: 'POST',
         body: formData,
       })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log('Success:', data);
+        .then(async (response) => {
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('token', data.token);
+            this.router.navigate(['/dashboard']);
+          } else {
+            const error = await response.json();
+            alert(error.message || 'サインインに失敗しました');
+          }
         })
         .catch((error) => {
           console.error('Error:', error);
+          alert('通信エラーが発生しました');
         });
     } else {
       console.log('Form is invalid');

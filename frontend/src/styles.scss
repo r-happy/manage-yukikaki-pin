@@ -3,6 +3,15 @@
   padding: 0;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+h1 {
+  font-size: 1.2em;
+}
+
 .auth-wrapper {
   display: grid;
   place-items: center;
@@ -44,11 +53,26 @@
         border: none;
         border-radius: 0.25rem;
         cursor: pointer;
+      }
+
+      a {
+        font-size: 0.8em;
+        color: #45556c;
+        text-align: center;
+        padding-top: 0.5rem;
+        text-decoration: none;
 
         &:hover {
-          background: darken(#51a2ff, 5%);
+          cursor: pointer;
+          text-decoration: underline;
         }
       }
     }
   }
+}
+
+.content-wrapper {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
 }

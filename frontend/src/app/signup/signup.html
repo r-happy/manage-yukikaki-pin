@@ -1,1 +1,17 @@
-<p>signup works!</p>
+<div class="auth-wrapper">
+    <div class="content">
+        <h1 class="title">
+            サインアップ
+        </h1>
+        <div>
+            <form class="form" [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
+                <input type="text" formControlName="user_name" placeholder="Name" required />
+                <input type="email" formControlName="user_email" placeholder="Email" required />
+                <input type="password" formControlName="user_password" placeholder="Password" required />
+                <input type="password" formControlName="user_confirmPassword" placeholder="Confirm Password" required />
+                <button type="submit">サインアップ</button>
+                <a routerLink="/signin">登録済みの方はこちら</a>
+            </form>
+        </div>
+    </div>
+</div>

@@ -5,9 +5,10 @@
         </h1>
         <div>
             <form class="form" [formGroup]="signInForm" (ngSubmit)="onSubmit()">
-                <input type="email" formControlName="email" />
-                <input type="password" formControlName="password" />
+                <input type="email" formControlName="email" placeholder="Email" required />
+                <input type="password" formControlName="password" placeholder="Password" required />
                 <button type="submit">サインイン</button>
+                <a routerLink="/signup">未登録の方はこちら</a>
             </form>
         </div>
     </div>
