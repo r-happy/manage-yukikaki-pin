@@ -11,8 +11,10 @@
                 <span class="value">{{ user.user_email }}</span>
             </div>
         </div>
-        <div>
-            <button (click)="onLogout()">ログアウト</button>
+        <div class="signout_button_wrapper">
+            <mat-icon class="signout_icon">logout</mat-icon>
+            <button class="signout_button" (click)="onLogout()">ログアウト</button>
         </div>
+        <a routerLink="/dashboard">ダッシュボードに戻る</a>
     </div>
 </div>

@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { User } from '../types/user.type';
 import { Router, RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatIconModule],
 })
 export class Profile implements OnInit {
   user: User | null = null;

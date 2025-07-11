@@ -57,7 +57,6 @@ h1 {
 
       a {
         font-size: 0.8em;
-        color: #45556c;
         text-align: center;
         padding-top: 0.5rem;
         text-decoration: none;
@@ -76,3 +75,6 @@ h1 {
   width: 100%;
   margin: 0 auto;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
