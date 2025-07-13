@@ -1,15 +1,13 @@
 <div class="content-wrapper">
-    <div class="content">
-        <h1>Profile</h1>
-        <div>
-            <div *ngIf="loading">Loading...</div>
-            <div *ngIf="error">{{ error }}</div>
-            <div *ngIf="user" class="profile-details">
-                <span class="label">名前</span>
-                <span class="value">{{ user.user_name }}</span>
-                <span class="label">メールアドレス</span>
-                <span class="value">{{ user.user_email }}</span>
-            </div>
+    <h1>Profile</h1>
+    <div *ngIf="loading">Loading...</div>
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+    <div *ngIf="user" class="content">
+        <div class="profile-details">
+            <span class="label">名前</span>
+            <span class="value">{{ user.user_name }}</span>
+            <span class="label">メールアドレス</span>
+            <span class="value">{{ user.user_email }}</span>
         </div>
         <div class="signout_button_wrapper">
             <mat-icon class="signout_icon">logout</mat-icon>

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { User } from '../types/user.type';
 import { Router, RouterModule } from '@angular/router';
@@ -17,7 +17,10 @@ export class Profile implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
     // 初期化処理
     this.user = null;
     this.loading = true;
@@ -25,14 +28,35 @@ export class Profile implements OnInit {
   }
 
   ngOnInit() {
+    // SSR環境では何もしない
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    // クライアントサイドでトークンチェック
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.router.navigate(['/signin']);
+      return;
+    }
+
+    // トークンがある場合のみAPIリクエスト
+    this.fetchUserData(token);
+  }
+
+  private fetchUserData(token: string) {
     fetch(`${environment.backendUrl}/api/me`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        Authorization: `Bearer ${token}`,
       },
     })
       .then(async (res) => {
         if (res.ok) {
           this.user = await res.json();
+        } else if (res.status === 401) {
+          // トークンが無効な場合
+          localStorage.removeItem('token');
+          this.router.navigate(['/signin']);
         } else {
           this.error = 'ユーザー情報の取得に失敗しました';
         }
@@ -46,7 +70,9 @@ export class Profile implements OnInit {
   }
 
   onLogout() {
-    localStorage.removeItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('token');
+    }
     this.router.navigate(['/signin']);
   }
 }

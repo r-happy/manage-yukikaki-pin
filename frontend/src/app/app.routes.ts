@@ -1,28 +1,33 @@
 import { Routes } from '@angular/router';
-import { Home } from './home/home';
 import { Signin } from './signin/signin';
 import { Signup } from './signup/signup';
 import { Dashboard } from './dashboard/dashboard';
 import { authGuard } from './guard/auth-guard';
-import { Layout } from './layout/layout';
 import { Profile } from './profile/profile';
+import { Map } from './map/map';
 
 export const routes: Routes = [
   {
     path: '',
-    component: Layout,
+    redirectTo: '/dashboard',
+    pathMatch: 'full',
+  },
+  {
+    path: 'dashboard',
+    title: 'Dashboard',
+    component: Dashboard,
     canActivate: [authGuard],
     children: [
       {
-        path: '',
-        title: 'Home',
-        component: Home,
+        path: 'map',
+        title: 'Map',
+        component: Map,
       },
+
       {
-        path: 'dashboard',
-        title: 'Dashboard',
-        component: Dashboard,
-        children: [{ path: 'profile', title: 'Profile', component: Profile }],
+        path: 'profile',
+        title: 'Profile',
+        component: Profile,
       },
     ],
   },
