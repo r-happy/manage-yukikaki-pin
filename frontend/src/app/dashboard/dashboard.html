@@ -5,10 +5,24 @@
         </a>
         <nav>
             <a routerLink="profile">Profile</a>
-            <a routerLink="map">Map</a>
         </nav>
     </header>
     <main>
-        <router-outlet></router-outlet>
+        <router-outlet class="content"></router-outlet>
+        <div class="select-wrapper">
+            <div class="select-wrapper-content">
+                <h2>グループ選択</h2>
+                <div *ngIf="loading">Loading groups...</div>
+                <div *ngIf="error" class="error-message">{{ error }}</div>
+                <div class="select" *ngIf="!loading && !error">
+                    <select (change)="onGroupChange($event)">
+                        <option value="">選択してください</option>
+                        <option *ngFor="let g of groups" [value]="g.group.group_id">
+                            {{ g.group.group_name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </main>
 </div>

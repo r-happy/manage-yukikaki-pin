@@ -31,10 +31,54 @@
       font-size: 1.2em;
     }
   }
-
   main {
     flex: 1;
     padding: 0.8em;
     overflow-y: auto;
+    position: relative;
+
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .select-wrapper {
+      position: absolute;
+      top: 1.6em;
+      right: 1.6em;
+      z-index: 1000;
+      background: white;
+      border: solid 1px #eee;
+      border-radius: 0.5rem;
+      padding: 0.8em;
+      min-width: 320px;
+      width: fit-content;
+      height: fit-content;
+      display: grid;
+      gap: 0.8em;
+
+      h2 {
+        font-size: 1.2em;
+      }
+
+      .select-wrapper-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        select {
+          padding: 0.5em;
+          border: 1px solid #f1f5f9;
+          border-radius: 0.25rem;
+          background-color: #fff;
+          width: 100%;
+
+          &:focus {
+            outline: none;
+            border-color: #51a2ff;
+          }
+        }
+      }
+    }
   }
 }

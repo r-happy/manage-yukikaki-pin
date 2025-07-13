@@ -23,7 +23,6 @@ export const routes: Routes = [
         title: 'Map',
         component: Map,
       },
-
       {
         path: 'profile',
         title: 'Profile',
