@@ -37,6 +37,11 @@ export class Dashboard implements OnInit {
   pinsError: string | null = null;
   pinTypesError: string | null = null;
   showSelectGroup = true;
+  showPanel = true;
+
+  togglePanel() {
+    this.showPanel = !this.showPanel;
+  }
 
   constructor(
     private router: Router,

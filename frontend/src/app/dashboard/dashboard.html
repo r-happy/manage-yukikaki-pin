@@ -9,7 +9,10 @@
     </header>
     <main>
         <router-outlet class="content"></router-outlet>
-        <div class="select-wrapper" *ngIf="showSelectGroup">
+        <button class="panel-toggle" (click)="togglePanel()">
+            <mat-icon>{{ showPanel ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <div class="select-wrapper" *ngIf="showSelectGroup && showPanel">
             <div class="select-wrapper-content">
                 <h2>グループ選択</h2>
                 <div *ngIf="loading">Loading groups...</div>

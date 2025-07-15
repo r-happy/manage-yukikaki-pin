@@ -2,16 +2,19 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
 
   header {
     padding: 0.8em;
     position: sticky;
+    top: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: #f8fafc;
     border-bottom: solid 1px #f1f5f9;
     height: 3.5em;
+    z-index: 1100;
 
     nav {
       display: flex;
@@ -43,23 +46,21 @@
       z-index: 1;
     }
 
-    .icon-wrapper {
+    .panel-toggle {
+      position: absolute;
+      top: 1.6em;
+      right: 1.6em;
+      z-index: 1001;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
       display: flex;
-      gap: 0.5em;
+      justify-content: center;
       align-items: center;
-
-      .icon-button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        border: solid 1px #e2e8f0;
-        padding: 0.25rem;
-        border-radius: 0.25rem;
-
-        mat-icon {
-          vertical-align: middle;
-        }
-      }
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
     .select-wrapper {
