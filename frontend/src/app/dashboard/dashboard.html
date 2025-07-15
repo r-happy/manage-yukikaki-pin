@@ -33,8 +33,14 @@
                     </div>
                     <div class="pintypes-list" *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length > 0">
                         <div class="pintype-item" *ngFor="let pt of pinTypes">
-                            <div class="pintype-name">{{ pt.pin_type_name }}</div>
-                            <div class="pintype-desc">{{ pt.pin_type_description }}</div>
+                            <div>
+                                <div class="pintype-name">{{ pt.pin_type_name }}</div>
+                                <div class="pintype-desc">{{ pt.pin_type_description }}</div>
+                            </div>
+                            <div class="icon-wrapper">
+                                <a class="icon-button"><mat-icon>edit</mat-icon></a>
+                                <a class="icon-button"><mat-icon>open_in_new</mat-icon></a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -49,9 +55,15 @@
                     </div>
                     <div class="pins-list" *ngIf="!pinsLoading && !pinsError && pins.length > 0">
                         <div class="pin-item" *ngFor="let pin of pins" (click)="onPinClick(pin)">
-                            <div class="pin-name">{{ pin.pin_name }}</div>
-                            <div class="pin-type">{{ pin.pin_type.pin_type_name }}</div>
-                            <div class="pin-location">{{ pin.latitude }}, {{ pin.longitude }}</div>
+                            <div>
+                                <div class="pin-name">{{ pin.pin_name }}</div>
+                                <div class="pin-type">{{ pin.pin_type.pin_type_name }}</div>
+                                <div class="pin-location">{{ pin.latitude }}, {{ pin.longitude }}</div>
+                            </div>
+                            <div class="icon-wrapper">
+                                <a class="icon-button"><mat-icon>edit</mat-icon></a>
+                                <a class="icon-button"><mat-icon>open_in_new</mat-icon></a>
+                            </div>
                         </div>
                     </div>
                 </div>

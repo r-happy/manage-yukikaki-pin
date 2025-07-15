@@ -11,10 +11,17 @@ import { environment } from '../../environments/environment';
 import { GroupDetail } from '../types/group-detail.type';
 import { Pin, PinType } from '../types/pin.type';
 import { filter } from 'rxjs/operators';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterModule, RouterOutlet, CommonModule, FormsModule],
+  imports: [
+    RouterModule,
+    RouterOutlet,
+    CommonModule,
+    FormsModule,
+    MatIconModule,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
