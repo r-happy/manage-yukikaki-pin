@@ -7,7 +7,7 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import type { Map as LeafletMap, Marker, Icon } from 'leaflet';
 import { environment } from '../../environments/environment';
@@ -17,6 +17,7 @@ import { Pin } from '../types/pin.type';
   selector: 'app-map',
   templateUrl: './map.html',
   styleUrls: ['./map.scss'], // styleUrl -> styleUrls (配列)
+  imports: [RouterModule],
 })
 export class Map implements OnInit, AfterViewInit, OnDestroy {
   private L: any;
@@ -25,16 +26,36 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   pins: Pin[] = []; // 初期化
 
   public groupId: string | null = null;
+  private isManualCenter = false; // 手動で中心を設定したかどうかのフラグ
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
-      this.groupId = params['groupId'] || null;
+      const newGroupId = params['groupId'] || null;
+
+      // グループが変更された場合、手動中心設定フラグをリセット
+      if (this.groupId !== newGroupId) {
+        this.isManualCenter = false;
+      }
+
+      this.groupId = newGroupId;
+
+      // 座標が指定されている場合は保存
+      const lat = params['lat'];
+      const lng = params['lng'];
+      const pinId = params['pinId'];
+
       this.fetchPins(localStorage.getItem('token') || '');
+
+      if (this.map && lat && lng) {
+        // 地図の中心を更新
+        this.centerMapOnPin(parseFloat(lat), parseFloat(lng), pinId);
+      }
     });
   }
 
@@ -73,7 +94,7 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
         this.updateMap();
       })
       .catch((error) => {
-        console.error('Error fetching pins:', error);
+        this.router.navigate(['/dashboard']);
         this.pins = [];
         this.updateMap();
       });
@@ -120,11 +141,45 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
         this.markers.push(marker);
       });
 
-      const group = this.L.featureGroup(this.markers);
-      this.map.fitBounds(group.getBounds().pad(0.1));
-    } else {
-      // If no pins, set a default view
+      // 手動で中心を設定していない場合のみfitBoundsを実行
+      if (!this.isManualCenter) {
+        const group = this.L.featureGroup(this.markers);
+        this.map.fitBounds(group.getBounds().pad(0.1));
+      }
+    } else if (!this.isManualCenter) {
+      // If no pins and not manually centered, set a default view
       this.map.setView([35.681236, 139.767125], 10); // Tokyo station
+    }
+  }
+
+  private centerMapOnPin(lat: number, lng: number, pinId?: string): void {
+    if (!this.map || !this.L) {
+      return;
+    }
+
+    // 手動で中心を設定したことを記録
+    this.isManualCenter = true;
+
+    // 指定された座標に地図の中心を移動（ズームレベル18で詳細表示）
+    this.map.setView([lat, lng], 18);
+
+    // 該当するピンのポップアップを開く
+    if (pinId) {
+      const targetMarker = this.markers.find((marker) => {
+        const pin = this.pins.find((p) => p.pin_id === pinId);
+        if (pin) {
+          const markerLatLng = marker.getLatLng();
+          return (
+            markerLatLng.lat === pin.latitude &&
+            markerLatLng.lng === pin.longitude
+          );
+        }
+        return false;
+      });
+
+      if (targetMarker) {
+        targetMarker.openPopup();
+      }
     }
   }
 }

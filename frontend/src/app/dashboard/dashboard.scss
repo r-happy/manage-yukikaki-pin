@@ -51,11 +51,15 @@
       border: solid 1px #eee;
       border-radius: 0.5rem;
       padding: 0.8em;
-      min-width: 320px;
+      min-width: 400px;
+      max-width: 450px;
       width: fit-content;
-      height: fit-content;
+      max-height: 80vh;
+      max-height: calc(100vh - 3.5em - 1.6em - 1.6em);
+      overflow: hidden;
       display: grid;
       gap: 0.8em;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 
       h2 {
         font-size: 1.2em;
@@ -76,6 +80,158 @@
           &:focus {
             outline: none;
             border-color: #51a2ff;
+          }
+        }
+
+        .pintypes-section {
+          margin-top: 1rem;
+
+          h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #475569;
+          }
+
+          .loading,
+          .error-message,
+          .no-pintypes {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+            border-radius: 0.25rem;
+          }
+
+          .loading {
+            background-color: #f1f5f9;
+            color: #64748b;
+          }
+
+          .error-message {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+          }
+
+          .no-pintypes {
+            background-color: #f8fafc;
+            color: #64748b;
+          }
+
+          .pintypes-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #f1f5f9;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+
+            .pintype-item {
+              padding: 0.5rem;
+              border-bottom: 1px solid #f1f5f9;
+              background: #f8fafc;
+              transition: background-color 0.2s ease;
+
+              &:last-child {
+                border-bottom: none;
+              }
+
+              &:hover {
+                background-color: #e0e7ef;
+              }
+
+              .pintype-name {
+                font-weight: 500;
+                color: #1e293b;
+                margin-bottom: 0.25rem;
+              }
+
+              .pintype-desc {
+                font-size: 0.8rem;
+                color: #64748b;
+                margin-bottom: 0.25rem;
+                font-style: italic;
+              }
+            }
+          }
+        }
+
+        .pins-section {
+          margin-top: 1rem;
+
+          h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #475569;
+          }
+
+          .loading,
+          .error-message,
+          .no-pins {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+            border-radius: 0.25rem;
+          }
+
+          .loading {
+            background-color: #f1f5f9;
+            color: #64748b;
+          }
+
+          .error-message {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+          }
+
+          .no-pins {
+            background-color: #f8fafc;
+            color: #64748b;
+          }
+
+          .pins-list {
+            height: 60%;
+            min-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #f1f5f9;
+            border-radius: 0.25rem;
+
+            .pin-item {
+              padding: 0.5rem;
+              border-bottom: 1px solid #f1f5f9;
+              cursor: pointer;
+              transition: background-color 0.2s ease;
+              background: #f8fafc;
+
+              &:last-child {
+                border-bottom: none;
+              }
+
+              &:hover {
+                background-color: #e0e7ef;
+              }
+
+              &:active {
+                background-color: #e2e8f0;
+              }
+
+              .pin-name {
+                font-weight: 500;
+                color: #1e293b;
+                margin-bottom: 0.25rem;
+              }
+
+              .pin-type {
+                font-size: 0.8rem;
+                color: #64748b;
+                margin-bottom: 0.25rem;
+              }
+
+              .pin-location {
+                font-size: 0.75rem;
+                color: #94a3b8;
+                font-family: monospace;
+              }
+            }
           }
         }
       }

@@ -4,23 +4,56 @@
             管理システム
         </a>
         <nav>
-            <a routerLink="profile">Profile</a>
+            <a routerLink="/dashboard/profile">Profile</a>
         </nav>
     </header>
     <main>
         <router-outlet class="content"></router-outlet>
-        <div class="select-wrapper">
+        <div class="select-wrapper" *ngIf="showSelectGroup">
             <div class="select-wrapper-content">
                 <h2>グループ選択</h2>
                 <div *ngIf="loading">Loading groups...</div>
                 <div *ngIf="error" class="error-message">{{ error }}</div>
                 <div class="select" *ngIf="!loading && !error">
-                    <select (change)="onGroupChange($event)">
+                    <select [(ngModel)]="selectedGroupId" (change)="onGroupChange($event)">
                         <option value="">選択してください</option>
                         <option *ngFor="let g of groups" [value]="g.group.group_id">
                             {{ g.group.group_name }}
                         </option>
                     </select>
+                </div>
+
+                <!-- PinType一覧セクション -->
+                <div class="pintypes-section" *ngIf="selectedGroupId && selectedGroupId !== ''">
+                    <h3>PinType一覧</h3>
+                    <div *ngIf="pinTypesLoading" class="loading">Loading PinTypes...</div>
+                    <div *ngIf="pinTypesError" class="error-message">{{ pinTypesError }}</div>
+                    <div *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length === 0" class="no-pintypes">
+                        PinTypeがありません
+                    </div>
+                    <div class="pintypes-list" *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length > 0">
+                        <div class="pintype-item" *ngFor="let pt of pinTypes">
+                            <div class="pintype-name">{{ pt.pin_type_name }}</div>
+                            <div class="pintype-desc">{{ pt.pin_type_description }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ピン一覧セクション -->
+                <div class="pins-section" *ngIf="selectedGroupId && selectedGroupId !== ''">
+                    <h3>ピン一覧</h3>
+                    <div *ngIf="pinsLoading" class="loading">Loading pins...</div>
+                    <div *ngIf="pinsError" class="error-message">{{ pinsError }}</div>
+                    <div *ngIf="!pinsLoading && !pinsError && pins.length === 0" class="no-pins">
+                        ピンがありません
+                    </div>
+                    <div class="pins-list" *ngIf="!pinsLoading && !pinsError && pins.length > 0">
+                        <div class="pin-item" *ngFor="let pin of pins" (click)="onPinClick(pin)">
+                            <div class="pin-name">{{ pin.pin_name }}</div>
+                            <div class="pin-type">{{ pin.pin_type.pin_type_name }}</div>
+                            <div class="pin-location">{{ pin.latitude }}, {{ pin.longitude }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
