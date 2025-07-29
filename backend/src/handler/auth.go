@@ -96,6 +96,7 @@ func SignIn(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "Error")
 	}
+
 	if user == nil {
 		return c.JSON(http.StatusUnauthorized, "Invalid Email or Password")
 	}

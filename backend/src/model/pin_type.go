@@ -40,7 +40,6 @@ func CreatePinType(pinType *PinType) error {
 }
 
 // PinTypeを探す関数群 //
-
 // PinTypeIDで探す
 func FindPinTypeByPinTypeID(pinTypeID uuid.UUID) (*PinType, error) {
 	var pinType PinType

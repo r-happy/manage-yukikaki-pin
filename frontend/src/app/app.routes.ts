@@ -5,6 +5,7 @@ import { Dashboard } from './dashboard/dashboard';
 import { authGuard } from './guard/auth-guard';
 import { Profile } from './profile/profile';
 import { Map } from './map/map';
+import { Pin } from './pin/pin';
 
 export const routes: Routes = [
   {
@@ -27,6 +28,11 @@ export const routes: Routes = [
         path: 'map',
         title: 'Map',
         component: Map,
+      },
+      {
+        path: 'pin',
+        title: 'Pin',
+        component: Pin,
       },
       {
         path: 'profile',

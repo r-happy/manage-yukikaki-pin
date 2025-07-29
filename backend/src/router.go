@@ -1,9 +1,12 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -11,6 +14,12 @@ import (
 )
 
 func newRouter() *echo.Echo {
+	// godotenv
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	e := echo.New()
 
 	// Global middleware
@@ -29,7 +38,7 @@ func newRouter() *echo.Echo {
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(handler.JwtCustomClaims)
 		},
-		SigningKey: []byte("secret"),
+		SigningKey: []byte(os.Getenv("SECRET_KEY")),
 	}
 	r.Use(echojwt.WithConfig(config))
 
@@ -44,7 +53,6 @@ func newRouter() *echo.Echo {
 	// group member
 	r.POST("/groups/:groupID/add-members", handler.AddGroupMemberByAdmin)
 	r.POST("/groups/:groupID/join-requests", handler.AddGroupMemberByAdmin)
-
 	// pin type
 	r.POST("/groups/:groupID/pin-types", handler.AddPinType)
 	r.GET("/groups/:groupID/pin-types", handler.GetPinTypesByGroupID)
