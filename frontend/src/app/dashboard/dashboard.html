@@ -15,6 +15,39 @@
         <div class="select-wrapper" *ngIf="showSelectGroup && showPanel">
             <div class="select-wrapper-content">
                 <h2>グループ選択</h2>
+                <div class="group-add">
+                    <button type="button" class="toggle" (click)="toggleAddGroupForm()">
+                        {{ showAddGroupForm ? 'フォームを閉じる' : '新しいグループを作成' }}
+                    </button>
+                    <form class="group-form" *ngIf="showAddGroupForm" (ngSubmit)="createGroup()">
+                        <label>
+                            グループ名
+                            <input type="text" [(ngModel)]="newGroup.group_name" name="group_name" required />
+                        </label>
+                        <label>
+                            説明
+                            <textarea [(ngModel)]="newGroup.group_description" name="group_description" rows="2"
+                                required></textarea>
+                        </label>
+                        <p class="current-user" *ngIf="currentUserId; else loadingUserId">
+                            あなたのユーザーID: <span>{{ currentUserId }}</span>
+                        </p>
+                        <ng-template #loadingUserId>
+                            <p class="current-user muted">ユーザーIDを取得中...</p>
+                        </ng-template>
+                        <p class="note">自分のIDは自動的に追加されます。</p>
+                        <label>
+                            追加のメンバーID（カンマ区切り・任意）
+                            <input type="text" [(ngModel)]="newGroup.user_ids" name="user_ids"
+                                placeholder="例: member-id-1,member-id-2" />
+                        </label>
+                        <div class="feedback" *ngIf="addGroupError">{{ addGroupError }}</div>
+                        <div class="feedback success" *ngIf="addGroupSuccess">{{ addGroupSuccess }}</div>
+                        <button type="submit" [disabled]="addGroupLoading">
+                            {{ addGroupLoading ? '送信中...' : '作成する' }}
+                        </button>
+                    </form>
+                </div>
                 <div *ngIf="loading">Loading groups...</div>
                 <div *ngIf="error" class="error-message">{{ error }}</div>
                 <div class="select" *ngIf="!loading && !error">
@@ -45,10 +78,29 @@
                             </div>
                         </div>
                     </div>
-                    <a class="add-pintype-wrapper">
-                        <p>種類を追加</p>
-                        <mat-icon>add</mat-icon>
-                    </a>
+                    <div class="add-pintype-wrapper">
+                        <button type="button" (click)="toggleAddPinTypeForm()">
+                            <mat-icon>{{ showAddPinTypeForm ? 'remove' : 'add' }}</mat-icon>
+                            <span>{{ showAddPinTypeForm ? 'キャンセル' : '種類を追加' }}</span>
+                        </button>
+                        <form *ngIf="showAddPinTypeForm" (ngSubmit)="createPinType()">
+                            <label>
+                                名称
+                                <input type="text" [(ngModel)]="newPinType.pin_type_name" name="pin_type_name"
+                                    required />
+                            </label>
+                            <label>
+                                説明
+                                <textarea [(ngModel)]="newPinType.pin_type_description" name="pin_type_description"
+                                    rows="2" required></textarea>
+                            </label>
+                            <div class="feedback" *ngIf="addPinTypeError">{{ addPinTypeError }}</div>
+                            <div class="feedback success" *ngIf="addPinTypeSuccess">{{ addPinTypeSuccess }}</div>
+                            <button type="submit" [disabled]="addPinTypeLoading">
+                                {{ addPinTypeLoading ? '送信中...' : '追加する' }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- ピン一覧セクション -->
@@ -71,10 +123,52 @@
                             </div>
                         </div>
                     </div>
-                    <a class="add-pin-wrapper">
-                        <p>ピンを追加</p>
-                        <mat-icon>add</mat-icon>
-                    </a>
+                    <div class="add-pin-wrapper">
+                        <button type="button" (click)="toggleAddPinForm()">
+                            <mat-icon>{{ showAddPinForm ? 'remove' : 'add' }}</mat-icon>
+                            <span>{{ showAddPinForm ? 'キャンセル' : 'ピンを追加' }}</span>
+                        </button>
+                        <form *ngIf="showAddPinForm" (ngSubmit)="createPin()">
+                            <div class="map-selection-info">
+                                <span>マップをクリックすると座標が自動入力されます。</span>
+                                <button type="button" class="clear-selection" (click)="clearSelectedCoordinates()"
+                                    *ngIf="newPin.latitude && newPin.longitude">
+                                    選択をクリア
+                                </button>
+                            </div>
+                            <div class="selected-coordinates" *ngIf="newPin.latitude && newPin.longitude">
+                                選択中: {{ newPin.latitude }}, {{ newPin.longitude }}
+                            </div>
+                            <label>
+                                ピンタイプ
+                                <select [(ngModel)]="newPin.pin_type_id" name="pin_type_id" required>
+                                    <option value="" disabled>選択してください</option>
+                                    <option *ngFor="let pt of pinTypes" [value]="pt.pin_type_id">
+                                        {{ pt.pin_type_name }}
+                                    </option>
+                                </select>
+                            </label>
+                            <label>
+                                ピン名
+                                <input type="text" [(ngModel)]="newPin.pin_name" name="pin_name" required />
+                            </label>
+                            <div class="latlng">
+                                <label>
+                                    緯度
+                                    <input type="text" [(ngModel)]="newPin.latitude" name="latitude" required />
+                                </label>
+                                <label>
+                                    経度
+                                    <input type="text" [(ngModel)]="newPin.longitude" name="longitude" required />
+                                </label>
+                            </div>
+                            <div class="feedback" *ngIf="addPinError">{{ addPinError }}</div>
+                            <div class="feedback success" *ngIf="addPinSuccess">{{ addPinSuccess }}</div>
+                            <button type="submit" [disabled]="addPinLoading">
+                                {{ addPinLoading ? '送信中...' : '追加する' }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

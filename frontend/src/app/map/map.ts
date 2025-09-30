@@ -10,8 +10,13 @@ import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import type { Map as LeafletMap, Marker, Icon } from 'leaflet';
+import { Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Pin } from '../types/pin.type';
+import {
+  CoordinateSelectionService,
+  SelectedCoordinates,
+} from '../services/coordinate-selection.service';
 
 @Component({
   selector: 'app-map',
@@ -23,6 +28,9 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   private L: any;
   private map: LeafletMap | undefined;
   private markers: Marker[] = [];
+  private selectionMarker: Marker | null = null;
+  private selectionSubscription?: Subscription;
+  private pendingSelection: { lat: number; lng: number } | null = null;
   pins: Pin[] = []; // 初期化
 
   public groupId: string | null = null;
@@ -31,7 +39,8 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private coordinateSelection: CoordinateSelectionService
   ) {}
 
   ngOnInit(): void {
@@ -57,6 +66,11 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
         this.centerMapOnPin(parseFloat(lat), parseFloat(lng), pinId);
       }
     });
+
+    this.selectionSubscription =
+      this.coordinateSelection.coordinates$.subscribe((coords) =>
+        this.handleCoordinateSelection(coords)
+      );
   }
 
   async ngAfterViewInit(): Promise<void> {
@@ -70,6 +84,7 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
     if (this.map) {
       this.map.remove();
     }
+    this.selectionSubscription?.unsubscribe();
   }
 
   private fetchPins(token: string) {
@@ -121,7 +136,31 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
       attribution: '© OpenStreetMap contributors',
     }).addTo(this.map);
 
+    const mapInstance = this.map;
+    if (!mapInstance) {
+      return;
+    }
+
+    mapInstance.on('click', (event: any) => {
+      const { lat, lng } = event.latlng;
+      this.isManualCenter = true;
+      this.setSelectionMarker(lat, lng, true);
+      this.coordinateSelection.setCoordinates({
+        latitude: lat,
+        longitude: lng,
+      });
+    });
+
     this.updateMap();
+
+    if (this.pendingSelection) {
+      this.setSelectionMarker(
+        this.pendingSelection.lat,
+        this.pendingSelection.lng,
+        false
+      );
+      this.pendingSelection = null;
+    }
   }
 
   private updateMap(): void {
@@ -180,6 +219,56 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
       if (targetMarker) {
         targetMarker.openPopup();
       }
+    }
+  }
+
+  private handleCoordinateSelection(coords: SelectedCoordinates | null) {
+    if (!coords) {
+      this.pendingSelection = null;
+      this.clearSelectionMarker();
+      return;
+    }
+
+    const { latitude, longitude } = coords;
+
+    if (!this.map || !this.L) {
+      this.pendingSelection = { lat: latitude, lng: longitude };
+      return;
+    }
+
+    this.setSelectionMarker(latitude, longitude, false);
+  }
+
+  private setSelectionMarker(lat: number, lng: number, focus = false) {
+    if (!this.map || !this.L) {
+      this.pendingSelection = { lat, lng };
+      return;
+    }
+
+    if (!this.selectionMarker) {
+      const marker = this.L.marker([lat, lng]).addTo(this.map);
+      marker.bindPopup('新しいピン候補');
+      this.selectionMarker = marker;
+    } else {
+      this.selectionMarker.setLatLng([lat, lng]);
+    }
+
+    if (focus) {
+      const map = this.map;
+      const marker = this.selectionMarker;
+
+      if (map && marker) {
+        const zoom = map.getZoom() < 16 ? 16 : map.getZoom();
+        map.setView([lat, lng], zoom);
+        marker.openPopup();
+      }
+    }
+  }
+
+  private clearSelectionMarker() {
+    if (this.selectionMarker) {
+      this.selectionMarker.remove();
+      this.selectionMarker = null;
     }
   }
 }
