@@ -4,7 +4,7 @@ pipeline {
     environment {
         // Set timezone for logs if desired
         TZ = 'Asia/Tokyo'
-    DEFAULT_FRONTEND_BACKEND_URL = 'https://api.mng-yukikaki.rhappy.dev'
+    DEFAULT_FRONTEND_BACKEND_URL = 'https://api.yukikaki.rhappy.dev'
         DOCKER_NETWORK_NAME = 'manage-yukikaki-net'
     }
 
