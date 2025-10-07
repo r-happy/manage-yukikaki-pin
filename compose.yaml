@@ -10,6 +10,8 @@ services:
         volumes:
             - ./backend/src/db:/app/db
         restart: unless-stopped
+        networks:
+            - manage-yukikaki-net
 
     frontend:
         build:
@@ -22,3 +24,9 @@ services:
         ports:
             - "8080:4200"
         restart: unless-stopped
+        networks:
+            - manage-yukikaki-net
+
+networks:
+    manage-yukikaki-net:
+        external: true
