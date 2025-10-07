@@ -14,4 +14,4 @@ EXPOSE 4200
 ENV NG_CLI_ANALYTICS="false"
 ENV BACKEND_URL="http://localhost:1323"
 
-CMD ["npm", "run", "start", "--", "--host", "0.0.0.0", "--port", "4200"]
+CMD ["npm", "run", "start", "--", "--host", "0.0.0.0", "--port", "4200", "--disable-host-check"]
