@@ -12,12 +12,12 @@ pipeline {
         stage('Prepare Network') {
             steps {
                 script {
-                    def networkExists = sh(
-                        script: "docker network ls --filter name=^${env.DOCKER_NETWORK_NAME}\\$ --format=\"{{ .Name }}\"",
-                        returnStdout: true
-                    ).trim()
+                    def networkStatus = sh(
+                        script: "docker network inspect ${env.DOCKER_NETWORK_NAME} > /dev/null 2>&1",
+                        returnStatus: true
+                    )
 
-                    if (networkExists == '') {
+                    if (networkStatus != 0) {
                         echo "Creating external network ${env.DOCKER_NETWORK_NAME}..."
                         sh "docker network create ${env.DOCKER_NETWORK_NAME}"
                     } else {
