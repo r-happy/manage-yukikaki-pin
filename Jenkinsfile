@@ -4,7 +4,7 @@ pipeline {
     environment {
         // Set timezone for logs if desired
         TZ = 'Asia/Tokyo'
-        DEFAULT_FRONTEND_BACKEND_URL = 'https://api.manage-yukikai.rhappy.dev'
+        DEFAULT_FRONTEND_BACKEND_URL = 'http://manage-yukikaki-backend:1323'
     }
 
     stages {
