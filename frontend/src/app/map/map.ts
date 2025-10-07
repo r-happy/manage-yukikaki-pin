@@ -6,10 +6,15 @@ import {
   Inject,
   PLATFORM_ID,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import type { Map as LeafletMap, Marker, Icon } from 'leaflet';
+import type {
+  Map as LeafletMap,
+  Marker,
+  Icon,
+  LeafletMouseEvent,
+} from 'leaflet';
 import { Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Pin } from '../types/pin.type';
@@ -17,12 +22,13 @@ import {
   CoordinateSelectionService,
   SelectedCoordinates,
 } from '../services/coordinate-selection.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.html',
   styleUrls: ['./map.scss'], // styleUrl -> styleUrls (配列)
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule, MatIconModule],
 })
 export class Map implements OnInit, AfterViewInit, OnDestroy {
   private L: any;
@@ -31,6 +37,7 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   private selectionMarker: Marker | null = null;
   private selectionSubscription?: Subscription;
   private pendingSelection: { lat: number; lng: number } | null = null;
+  selectedCoordinates: SelectedCoordinates | null = null;
   pins: Pin[] = []; // 初期化
 
   public groupId: string | null = null;
@@ -141,10 +148,11 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    mapInstance.on('click', (event: any) => {
+    mapInstance.on('click', (event: LeafletMouseEvent) => {
       const { lat, lng } = event.latlng;
       this.isManualCenter = true;
       this.setSelectionMarker(lat, lng, true);
+      this.selectedCoordinates = { latitude: lat, longitude: lng };
       this.coordinateSelection.setCoordinates({
         latitude: lat,
         longitude: lng,
@@ -223,6 +231,8 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private handleCoordinateSelection(coords: SelectedCoordinates | null) {
+    this.selectedCoordinates = coords;
+
     if (!coords) {
       this.pendingSelection = null;
       this.clearSelectionMarker();
@@ -270,5 +280,17 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
       this.selectionMarker.remove();
       this.selectionMarker = null;
     }
+  }
+
+  clearSelectionFromMap() {
+    this.coordinateSelection.clear();
+  }
+
+  get selectedCoordinateText(): string | null {
+    if (!this.selectedCoordinates) {
+      return null;
+    }
+    const { latitude, longitude } = this.selectedCoordinates;
+    return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
   }
 }

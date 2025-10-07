@@ -15,9 +15,13 @@ import (
 
 func newRouter() *echo.Echo {
 	// godotenv
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if err := godotenv.Load(); err != nil {
+		log.Printf("[warn] .env file not found, continuing with existing environment: %v", err)
+	}
+
+	secretKey, ok := os.LookupEnv("SECRET_KEY")
+	if !ok || secretKey == "" {
+		log.Fatal("SECRET_KEY environment variable must be set")
 	}
 
 	e := echo.New()

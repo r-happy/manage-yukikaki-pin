@@ -1,1 +1,15 @@
-<div id="map" class="map-container"></div>
+<div class="map-wrapper">
+    <div id="map" class="map-container"></div>
+    <div class="map-overlay">
+        <div class="map-instruction">
+            <mat-icon fontIcon="add_location_alt"></mat-icon>
+            <span>地図上をクリックしてピンの位置を選択してください。</span>
+        </div>
+        <div class="map-selection" *ngIf="selectedCoordinateText as text">
+            <span>選択中: {{ text }}</span>
+            <button type="button" (click)="clearSelectionFromMap()">
+                クリア
+            </button>
+        </div>
+    </div>
+</div>
