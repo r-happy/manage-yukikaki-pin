@@ -5,6 +5,7 @@ pipeline {
         // Set timezone for logs if desired
         TZ = 'Asia/Tokyo'
         DEFAULT_FRONTEND_BACKEND_URL = 'http://manage-yukikaki-backend:1323'
+        DOCKER_NETWORK_NAME = 'manage-yukikaki-net'
     }
 
     stages {
@@ -12,15 +13,15 @@ pipeline {
             steps {
                 script {
                     def networkExists = sh(
-                        script: 'docker network ls --filter name=^gm-yatai-network$ --format="{{ .Name }}"',
+                        script: "docker network ls --filter name=^${env.DOCKER_NETWORK_NAME}\\$ --format=\"{{ .Name }}\"",
                         returnStdout: true
                     ).trim()
 
                     if (networkExists == '') {
-                        echo 'Creating external network gm-yatai-network...'
-                        sh 'docker network create gm-yatai-network'
+                        echo "Creating external network ${env.DOCKER_NETWORK_NAME}..."
+                        sh "docker network create ${env.DOCKER_NETWORK_NAME}"
                     } else {
-                        echo 'External network gm-yatai-network already exists.'
+                        echo "External network ${env.DOCKER_NETWORK_NAME} already exists."
                     }
                 }
             }
