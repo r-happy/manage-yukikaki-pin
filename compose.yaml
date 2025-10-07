@@ -18,7 +18,7 @@ services:
         depends_on:
             - backend
         environment:
-            BACKEND_URL: ${FRONTEND_BACKEND_URL:-http://localhost:1323}
+            BACKEND_URL: ${FRONTEND_BACKEND_URL:-https://api.mng-yukikaki.rhappy.dev}
         restart: unless-stopped
         networks:
             - manage-yukikaki-net

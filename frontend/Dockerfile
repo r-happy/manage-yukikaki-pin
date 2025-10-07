@@ -12,6 +12,6 @@ COPY . .
 EXPOSE 4200
 
 ENV NG_CLI_ANALYTICS="false"
-ENV BACKEND_URL="http://localhost:1323"
+ENV BACKEND_URL="https://api.mng-yukikaki.rhappy.dev"
 
 CMD ["npm", "run", "start", "--", "--host", "0.0.0.0", "--port", "4200"]
