@@ -17,6 +17,7 @@ import { environment } from '../../environments/environment';
 import { GroupDetail } from '../types/group-detail.type';
 import { Pin, PinType } from '../types/pin.type';
 import { User } from '../types/user.type';
+import { GroupMember } from '../types/group.type';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,14 +42,17 @@ export class Dashboard implements OnInit, OnDestroy {
   groups: GroupDetail[] = [];
   pins: Pin[] = [];
   pinTypes: PinType[] = [];
+  members: GroupMember[] = [];
   currentUserId: string | null = null;
   selectedGroupId: string = '';
   loading = true;
   pinsLoading = false;
   pinTypesLoading = false;
+  membersLoading = false;
   error: string | null = null;
   pinsError: string | null = null;
   pinTypesError: string | null = null;
+  membersError: string | null = null;
   showSelectGroup = true;
   showPanel = true;
   showAddGroupForm = false;
@@ -78,6 +82,17 @@ export class Dashboard implements OnInit, OnDestroy {
     latitude: '',
     longitude: '',
   };
+  showAddMemberForm = false;
+  addMemberLoading = false;
+  addMemberError: string | null = null;
+  addMemberSuccess: string | null = null;
+  newMember = {
+    user_ids: '',
+    admin: false,
+  };
+  editingMember: GroupMember | null = null;
+  editMemberLoading = false;
+  editMemberError: string | null = null;
   private coordinateSubscription?: Subscription;
 
   togglePanel() {
@@ -148,6 +163,7 @@ export class Dashboard implements OnInit, OnDestroy {
             if (token) {
               this.fetchPins(groupIdFromUrl);
               this.fetchPinTypes(groupIdFromUrl);
+              this.fetchMembers(groupIdFromUrl);
             }
           }
         } else if (!groupIdFromUrl && this.selectedGroupId !== '') {
@@ -155,8 +171,10 @@ export class Dashboard implements OnInit, OnDestroy {
           this.coordinateSelection.clear();
           this.pins = [];
           this.pinTypes = [];
+          this.members = [];
           this.pinsError = null;
           this.pinTypesError = null;
+          this.membersError = null;
         }
       });
 
@@ -194,6 +212,7 @@ export class Dashboard implements OnInit, OnDestroy {
             this.selectedGroupId = groupIdFromUrl;
             this.fetchPins(groupIdFromUrl);
             this.fetchPinTypes(groupIdFromUrl);
+            this.fetchMembers(groupIdFromUrl);
           }
         } else if (res.status === 401) {
           localStorage.removeItem('token');
@@ -288,12 +307,15 @@ export class Dashboard implements OnInit, OnDestroy {
       });
       this.fetchPins(value);
       this.fetchPinTypes(value);
+      this.fetchMembers(value);
     } else {
       this.router.navigate(['/dashboard/map']);
       this.pins = [];
       this.pinTypes = [];
+      this.members = [];
       this.pinsError = null;
       this.pinTypesError = null;
+      this.membersError = null;
     }
   }
 
@@ -564,5 +586,210 @@ export class Dashboard implements OnInit, OnDestroy {
     this.coordinateSelection.clear();
     this.newPin.latitude = '';
     this.newPin.longitude = '';
+  }
+
+  // メンバー管理機能
+  toggleAddMemberForm() {
+    this.showAddMemberForm = !this.showAddMemberForm;
+    if (!this.showAddMemberForm) {
+      this.resetAddMemberFeedback();
+    }
+  }
+
+  private resetAddMemberFeedback() {
+    this.addMemberError = null;
+    this.addMemberSuccess = null;
+  }
+
+  private fetchMembers(groupId: string) {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    this.membersLoading = true;
+    this.membersError = null;
+
+    fetch(`${environment.backendUrl}/api/groups/${groupId}/members`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(async (res) => {
+        if (res.ok) {
+          this.members = await res.json();
+        } else if (res.status === 401) {
+          localStorage.removeItem('token');
+          this.router.navigate(['/signin']);
+        } else {
+          this.membersError = 'メンバーの取得に失敗しました';
+        }
+      })
+      .catch(() => (this.membersError = '通信エラー'))
+      .finally(() => (this.membersLoading = false));
+  }
+
+  async addMember() {
+    if (!this.selectedGroupId) {
+      this.addMemberError = 'グループを選択してください。';
+      this.addMemberSuccess = null;
+      return;
+    }
+
+    if (!this.newMember.user_ids) {
+      this.addMemberError = 'ユーザーIDを入力してください。';
+      this.addMemberSuccess = null;
+      return;
+    }
+
+    if (!isPlatformBrowser(this.platformId)) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.router.navigate(['/signin']);
+      return;
+    }
+
+    this.addMemberLoading = true;
+    this.resetAddMemberFeedback();
+
+    const params = new URLSearchParams();
+    params.set('user_ids', this.newMember.user_ids.trim());
+    params.set('admin', this.newMember.admin.toString());
+
+    try {
+      const res = await fetch(
+        `${environment.backendUrl}/api/groups/${this.selectedGroupId}/add-members`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+          },
+          body: params.toString(),
+        }
+      );
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          localStorage.removeItem('token');
+          this.router.navigate(['/signin']);
+          return;
+        }
+        const message = await res.text();
+        this.addMemberError = message || 'メンバーの追加に失敗しました。';
+        return;
+      }
+
+      this.addMemberSuccess = 'メンバーを追加しました。';
+      this.newMember = {
+        user_ids: '',
+        admin: false,
+      };
+      this.fetchMembers(this.selectedGroupId);
+    } catch (error) {
+      this.addMemberError = '通信エラーが発生しました。';
+    } finally {
+      this.addMemberLoading = false;
+    }
+  }
+
+  editMember(member: GroupMember) {
+    this.editingMember = { ...member };
+    this.editMemberError = null;
+  }
+
+  cancelEditMember() {
+    this.editingMember = null;
+    this.editMemberError = null;
+  }
+
+  async updateMember(member: GroupMember) {
+    if (!this.selectedGroupId || !member) return;
+
+    if (!isPlatformBrowser(this.platformId)) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.router.navigate(['/signin']);
+      return;
+    }
+
+    this.editMemberLoading = true;
+    this.editMemberError = null;
+
+    const params = new URLSearchParams();
+    params.set('admin', member.admin.toString());
+    params.set('not_allowed', member.not_allowed.toString());
+
+    try {
+      const res = await fetch(
+        `${environment.backendUrl}/api/groups/${this.selectedGroupId}/members/${member.group_member_id}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+          },
+          body: params.toString(),
+        }
+      );
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          localStorage.removeItem('token');
+          this.router.navigate(['/signin']);
+          return;
+        }
+        const message = await res.text();
+        this.editMemberError = message || 'メンバーの更新に失敗しました。';
+        return;
+      }
+
+      this.editingMember = null;
+      this.fetchMembers(this.selectedGroupId);
+    } catch (error) {
+      this.editMemberError = '通信エラーが発生しました。';
+    } finally {
+      this.editMemberLoading = false;
+    }
+  }
+
+  async deleteMember(member: GroupMember) {
+    if (!this.selectedGroupId) return;
+
+    if (!confirm(`${member.user.user_name} をグループから削除しますか？`)) {
+      return;
+    }
+
+    if (!isPlatformBrowser(this.platformId)) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.router.navigate(['/signin']);
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${environment.backendUrl}/api/groups/${this.selectedGroupId}/members/${member.group_member_id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          localStorage.removeItem('token');
+          this.router.navigate(['/signin']);
+          return;
+        }
+        alert('メンバーの削除に失敗しました。');
+        return;
+      }
+
+      this.fetchMembers(this.selectedGroupId);
+    } catch (error) {
+      alert('通信エラーが発生しました。');
+    }
   }
 }

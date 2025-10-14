@@ -86,3 +86,53 @@ func FindPinsByGroupID(groupID uuid.UUID) ([]Pin, error) {
 
 	return pins, nil
 }
+
+// Pinの更新
+func UpdatePin(pinID uuid.UUID, pinName string, pinTypeID uuid.UUID, latitude float64, longitude float64) (*Pin, error) {
+	// バリデーション
+	if latitude < -90 || latitude > 90 {
+		return nil, errors.New("latitude must be between -90 and 90 degrees")
+	}
+	if longitude < -180 || longitude > 180 {
+		return nil, errors.New("longitude must be between -180 and 180 degrees")
+	}
+
+	// Pinの取得
+	pin, err := FindPinByPinID(pinID)
+	if err != nil {
+		return nil, errors.New("pin not found")
+	}
+
+	// PinTypeの存在確認
+	if pt, _ := FindPinTypeByPinTypeID(pinTypeID); pt == nil {
+		return nil, errors.New("pin type not found")
+	}
+
+	// 更新
+	pin.PinName = pinName
+	pin.PinTypeID = pinTypeID
+	pin.Latitude = latitude
+	pin.Longitude = longitude
+
+	r := db.Save(pin)
+	if r.Error != nil {
+		return nil, r.Error
+	}
+
+	return pin, nil
+}
+
+// Pinの削除（ソフトデリート）
+func DeletePin(pinID uuid.UUID) error {
+	pin, err := FindPinByPinID(pinID)
+	if err != nil {
+		return errors.New("pin not found")
+	}
+
+	r := db.Delete(pin)
+	if r.Error != nil {
+		return r.Error
+	}
+
+	return nil
+}

@@ -1,1 +1,93 @@
-<p>pin works!</p>
+<div class="pin-detail-container" *ngIf="pin">
+    <div class="pin-header">
+        <h2>ピン詳細</h2>
+        <button class="back-button" (click)="goBack()">← 戻る</button>
+    </div>
+
+    <div class="message success" *ngIf="successMessage">
+        {{ successMessage }}
+    </div>
+
+    <div class="message error" *ngIf="errorMessage">
+        {{ errorMessage }}
+    </div>
+
+    <div class="pin-content" *ngIf="!editMode">
+        <div class="pin-info">
+            <div class="info-row">
+                <label>ピン名:</label>
+                <span>{{ pin.pin_name }}</span>
+            </div>
+            <div class="info-row">
+                <label>ピンタイプ:</label>
+                <span>{{ pin.pin_type.pin_type_name }}</span>
+            </div>
+            <div class="info-row">
+                <label>説明:</label>
+                <span>{{ pin.pin_type.pin_type_description || '説明なし' }}</span>
+            </div>
+            <div class="info-row">
+                <label>緯度:</label>
+                <span>{{ pin.latitude }}</span>
+            </div>
+            <div class="info-row">
+                <label>経度:</label>
+                <span>{{ pin.longitude }}</span>
+            </div>
+            <div class="info-row">
+                <label>作成者:</label>
+                <span>{{ pin.pin_created_by.user_name }}</span>
+            </div>
+            <div class="info-row">
+                <label>作成日:</label>
+                <span>{{ pin.created_at | date: 'yyyy/MM/dd HH:mm' }}</span>
+            </div>
+        </div>
+
+        <div class="pin-actions">
+            <button class="edit-button" (click)="enableEditMode()">編集</button>
+            <button class="delete-button" (click)="deletePin()">削除</button>
+        </div>
+    </div>
+
+    <div class="pin-edit-form" *ngIf="editMode">
+        <form (ngSubmit)="updatePin()">
+            <div class="form-group">
+                <label for="pinName">ピン名 *</label>
+                <input type="text" id="pinName" [(ngModel)]="pinName" name="pinName" required />
+            </div>
+
+            <div class="form-group">
+                <label for="pinType">ピンタイプ *</label>
+                <select id="pinType" [(ngModel)]="selectedPinTypeId" name="pinType" required>
+                    <option *ngFor="let pinType of pinTypes" [value]="pinType.pin_type_id">
+                        {{ pinType.pin_type_name }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="latitude">緯度 *</label>
+                <input type="number" id="latitude" [(ngModel)]="latitude" name="latitude" step="0.000001" min="-90"
+                    max="90" required />
+            </div>
+
+            <div class="form-group">
+                <label for="longitude">経度 *</label>
+                <input type="number" id="longitude" [(ngModel)]="longitude" name="longitude" step="0.000001" min="-180"
+                    max="180" required />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="save-button">保存</button>
+                <button type="button" class="cancel-button" (click)="cancelEdit()">
+                    キャンセル
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="pin-loading" *ngIf="!pin">
+    <p>ピン情報を読み込んでいます...</p>
+</div>

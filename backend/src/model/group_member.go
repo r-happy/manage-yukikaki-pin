@@ -151,3 +151,36 @@ func IsMemberOfGroup(groupID uuid.UUID, userID uuid.UUID) (bool, error) {
 	}
 	return true, nil
 }
+
+// GroupMemberの更新
+func UpdateGroupMember(groupMemberID uuid.UUID, admin bool, notAllowed bool) (*GroupMember, error) {
+	groupMember, err := FindGroupMemberByGroupMemberID(groupMemberID)
+	if err != nil {
+		return nil, errors.New("group member not found")
+	}
+
+	groupMember.Admin = admin
+	groupMember.NotAllowed = notAllowed
+
+	r := db.Save(groupMember)
+	if r.Error != nil {
+		return nil, r.Error
+	}
+
+	return groupMember, nil
+}
+
+// GroupMemberの削除（実際にはDBから削除）
+func DeleteGroupMember(groupMemberID uuid.UUID) error {
+	groupMember, err := FindGroupMemberByGroupMemberID(groupMemberID)
+	if err != nil {
+		return errors.New("group member not found")
+	}
+
+	r := db.Unscoped().Delete(groupMember)
+	if r.Error != nil {
+		return r.Error
+	}
+
+	return nil
+}

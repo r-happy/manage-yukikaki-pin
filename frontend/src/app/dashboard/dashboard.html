@@ -103,6 +103,89 @@
                     </div>
                 </div>
 
+                <!-- メンバー一覧セクション -->
+                <div class="members-section" *ngIf="selectedGroupId && selectedGroupId !== ''">
+                    <h3>メンバー一覧</h3>
+                    <div *ngIf="membersLoading" class="loading">Loading members...</div>
+                    <div *ngIf="membersError" class="error-message">{{ membersError }}</div>
+                    <div *ngIf="!membersLoading && !membersError && members.length === 0" class="no-members">
+                        メンバーがいません
+                    </div>
+                    <div class="members-list" *ngIf="!membersLoading && !membersError && members.length > 0">
+                        <div class="member-item" *ngFor="let member of members">
+                            <div *ngIf="editingMember?.group_member_id !== member.group_member_id" class="member-view">
+                                <div class="member-info">
+                                    <div class="member-name">{{ member.user.user_name }}</div>
+                                    <div class="member-email">{{ member.user.user_email }}</div>
+                                    <div class="member-badges">
+                                        <span class="badge admin" *ngIf="member.admin">管理者</span>
+                                        <span class="badge blocked" *ngIf="member.not_allowed">ブロック中</span>
+                                    </div>
+                                </div>
+                                <div class="member-actions">
+                                    <button type="button" class="icon-button" (click)="editMember(member)">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                    <button type="button" class="icon-button delete" (click)="deleteMember(member)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            <div *ngIf="editingMember?.group_member_id === member.group_member_id && editingMember"
+                                class="member-edit">
+                                <div class="member-info">
+                                    <div class="member-name">{{ editingMember!.user.user_name }}</div>
+                                    <div class="member-email">{{ editingMember!.user.user_email }}</div>
+                                </div>
+                                <div class="edit-form">
+                                    <label>
+                                        <input type="checkbox" [(ngModel)]="editingMember!.admin"
+                                            name="admin_{{member.group_member_id}}" />
+                                        管理者
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" [(ngModel)]="editingMember!.not_allowed"
+                                            name="not_allowed_{{member.group_member_id}}" />
+                                        ブロック
+                                    </label>
+                                    <div class="feedback" *ngIf="editMemberError">{{ editMemberError }}</div>
+                                    <div class="edit-actions">
+                                        <button type="button" class="save-btn" (click)="updateMember(editingMember!)"
+                                            [disabled]="editMemberLoading">
+                                            {{ editMemberLoading ? '保存中...' : '保存' }}
+                                        </button>
+                                        <button type="button" class="cancel-btn" (click)="cancelEditMember()">
+                                            キャンセル
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="add-member-wrapper">
+                        <button type="button" (click)="toggleAddMemberForm()">
+                            <mat-icon>{{ showAddMemberForm ? 'remove' : 'add' }}</mat-icon>
+                            <span>{{ showAddMemberForm ? 'キャンセル' : 'メンバーを追加' }}</span>
+                        </button>
+                        <form *ngIf="showAddMemberForm" (ngSubmit)="addMember()">
+                            <label>
+                                ユーザーID（カンマ区切り）
+                                <input type="text" [(ngModel)]="newMember.user_ids" name="user_ids"
+                                    placeholder="例: user-id-1,user-id-2" required />
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" [(ngModel)]="newMember.admin" name="admin" />
+                                管理者権限を付与
+                            </label>
+                            <div class="feedback" *ngIf="addMemberError">{{ addMemberError }}</div>
+                            <div class="feedback success" *ngIf="addMemberSuccess">{{ addMemberSuccess }}</div>
+                            <button type="submit" [disabled]="addMemberLoading">
+                                {{ addMemberLoading ? '送信中...' : '追加する' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
                 <!-- ピン一覧セクション -->
                 <div class="pins-section" *ngIf="selectedGroupId && selectedGroupId !== ''">
                     <h3>ピン一覧</h3>

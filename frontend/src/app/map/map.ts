@@ -182,9 +182,16 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.pins && this.pins.length > 0) {
       this.pins.forEach((pin) => {
+        const popupContent = `
+          <div>
+            <b>${pin.pin_name}</b><br>
+            ${pin.pin_type.pin_type_name}<br>
+            <button onclick="window.location.href='/pin?pinId=${pin.pin_id}&groupId=${this.groupId}'" style="margin-top: 8px; padding: 4px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">詳細を見る</button>
+          </div>
+        `;
         const marker = this.L.marker([pin.latitude, pin.longitude])
           .addTo(this.map)
-          .bindPopup(`<b>${pin.pin_name}</b><br>${pin.pin_type.pin_type_name}`);
+          .bindPopup(popupContent);
         this.markers.push(marker);
       });
 

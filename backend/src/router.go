@@ -55,8 +55,11 @@ func newRouter() *echo.Echo {
 	r.GET("/groups/:groupID", handler.GetGroup)
 
 	// group member
+	r.GET("/groups/:groupID/members", handler.GetGroupMembers)
 	r.POST("/groups/:groupID/add-members", handler.AddGroupMemberByAdmin)
 	r.POST("/groups/:groupID/join-requests", handler.AddGroupMemberByAdmin)
+	r.PUT("/groups/:groupID/members/:memberID", handler.UpdateGroupMember)
+	r.DELETE("/groups/:groupID/members/:memberID", handler.DeleteGroupMember)
 	// pin type
 	r.POST("/groups/:groupID/pin-types", handler.AddPinType)
 	r.GET("/groups/:groupID/pin-types", handler.GetPinTypesByGroupID)
@@ -64,6 +67,8 @@ func newRouter() *echo.Echo {
 	// pin
 	r.POST("/groups/:groupID/pins", handler.AddPinByMember)
 	r.GET("/groups/:groupID/pins", handler.GetPinsByGroupID)
+	r.PUT("/groups/:groupID/pins/:pinID", handler.UpdatePinByMember)
+	r.DELETE("/groups/:groupID/pins/:pinID", handler.DeletePinByMember)
 
 	return e
 }
