@@ -143,7 +143,7 @@ export class Pin implements OnInit {
         this.successMessage = 'ピンを更新しました';
         setTimeout(() => {
           this.successMessage = '';
-          this.router.navigate(['/map'], {
+          this.router.navigate(['/dashboard/map'], {
             queryParams: { groupId: this.groupId },
           });
         }, 1500);
@@ -183,7 +183,7 @@ export class Pin implements OnInit {
       .then(() => {
         this.successMessage = 'ピンを削除しました';
         setTimeout(() => {
-          this.router.navigate(['/map'], {
+          this.router.navigate(['/dashboard/map'], {
             queryParams: { groupId: this.groupId },
           });
         }, 1500);
@@ -195,7 +195,7 @@ export class Pin implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/map'], {
+    this.router.navigate(['/dashboard/map'], {
       queryParams: { groupId: this.groupId },
     });
   }
