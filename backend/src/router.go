@@ -35,6 +35,7 @@ func newRouter() *echo.Echo {
 	e.GET("/", func(c echo.Context) error { return c.JSON(http.StatusOK, "Hello world") })
 	e.POST("/signup", handler.SignUp)
 	e.POST("/signin", handler.SignIn)
+	e.GET("/public/groups/:groupID/pins", handler.GetPublicPinsByGroupID)
 
 	// jwt middleware
 	r := e.Group("/api")

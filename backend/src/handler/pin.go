@@ -115,3 +115,29 @@ func GetPinsByGroupID(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, pins)
 }
+
+// GetPublicPinsByGroupID //
+// 認証不要でグループのピン情報を取得
+func GetPublicPinsByGroupID(c echo.Context) error {
+	groupIDstr := c.Param("groupID")
+	if groupIDstr == "" {
+		return c.JSON(http.StatusBadRequest, "Group ID is required")
+	}
+	groupID := uuid.MustParse(groupIDstr)
+
+	// グループの存在確認
+	group, err := model.FindGroupByGroupID(groupID)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, "Group not found")
+	}
+	if group == nil {
+		return c.JSON(http.StatusNotFound, "Group not found")
+	}
+
+	pins, err := model.FindPinsByGroupID(groupID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Error retrieving pins: "+err.Error())
+	}
+
+	return c.JSON(http.StatusOK, pins)
+}
