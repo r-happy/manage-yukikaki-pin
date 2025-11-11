@@ -79,7 +79,8 @@
                             <h3>PinType一覧</h3>
                             <div *ngIf="pinTypesLoading" class="loading">Loading PinTypes...</div>
                             <div *ngIf="pinTypesError" class="error-message">{{ pinTypesError }}</div>
-                            <div *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length === 0" class="empty-state">
+                            <div *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length === 0"
+                                class="empty-state">
                                 PinTypeがありません
                             </div>
                             <div class="item-list" *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length > 0">
@@ -128,7 +129,8 @@
                             </div>
                             <div class="item-list" *ngIf="!membersLoading && !membersError && members.length > 0">
                                 <div class="list-item" *ngFor="let member of members">
-                                    <div *ngIf="editingMember?.group_member_id !== member.group_member_id" class="item-view">
+                                    <div *ngIf="editingMember?.group_member_id !== member.group_member_id"
+                                        class="item-view">
                                         <div class="item-content">
                                             <div class="item-title">{{ member.user.user_name }}</div>
                                             <div class="item-description">{{ member.user.user_email }}</div>
@@ -141,7 +143,8 @@
                                             <button type="button" class="icon-btn" (click)="editMember(member)">
                                                 <mat-icon>edit</mat-icon>
                                             </button>
-                                            <button type="button" class="icon-btn delete" (click)="deleteMember(member)">
+                                            <button type="button" class="icon-btn delete"
+                                                (click)="deleteMember(member)">
                                                 <mat-icon>delete</mat-icon>
                                             </button>
                                         </div>
@@ -163,13 +166,16 @@
                                                     name="not_allowed_{{member.group_member_id}}" />
                                                 ブロック
                                             </label>
-                                            <div class="feedback error" *ngIf="editMemberError">{{ editMemberError }}</div>
+                                            <div class="feedback error" *ngIf="editMemberError">{{ editMemberError }}
+                                            </div>
                                             <div class="form-actions">
-                                                <button type="button" class="btn-primary" (click)="updateMember(editingMember!)"
+                                                <button type="button" class="btn-primary"
+                                                    (click)="updateMember(editingMember!)"
                                                     [disabled]="editMemberLoading">
                                                     {{ editMemberLoading ? '保存中...' : '保存' }}
                                                 </button>
-                                                <button type="button" class="btn-secondary" (click)="cancelEditMember()">
+                                                <button type="button" class="btn-secondary"
+                                                    (click)="cancelEditMember()">
                                                     キャンセル
                                                 </button>
                                             </div>
