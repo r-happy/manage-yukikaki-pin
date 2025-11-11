@@ -15,40 +15,9 @@
         <div class="select-wrapper" *ngIf="showSelectGroup && showPanel">
             <div class="select-wrapper-content">
                 <h2>グループ選択</h2>
-                <div class="group-add">
-                    <button type="button" class="toggle" (click)="toggleAddGroupForm()">
-                        {{ showAddGroupForm ? 'フォームを閉じる' : '新しいグループを作成' }}
-                    </button>
-                    <form class="group-form" *ngIf="showAddGroupForm" (ngSubmit)="createGroup()">
-                        <label>
-                            グループ名
-                            <input type="text" [(ngModel)]="newGroup.group_name" name="group_name" required />
-                        </label>
-                        <label>
-                            説明
-                            <textarea [(ngModel)]="newGroup.group_description" name="group_description" rows="2"
-                                required></textarea>
-                        </label>
-                        <p class="current-user" *ngIf="currentUserId; else loadingUserId">
-                            あなたのユーザーID: <span>{{ currentUserId }}</span>
-                        </p>
-                        <ng-template #loadingUserId>
-                            <p class="current-user muted">ユーザーIDを取得中...</p>
-                        </ng-template>
-                        <p class="note">自分のIDは自動的に追加されます。</p>
-                        <label>
-                            追加のメンバーID（カンマ区切り・任意）
-                            <input type="text" [(ngModel)]="newGroup.user_ids" name="user_ids"
-                                placeholder="例: member-id-1,member-id-2" />
-                        </label>
-                        <div class="feedback" *ngIf="addGroupError">{{ addGroupError }}</div>
-                        <div class="feedback success" *ngIf="addGroupSuccess">{{ addGroupSuccess }}</div>
-                        <button type="submit" [disabled]="addGroupLoading">
-                            {{ addGroupLoading ? '送信中...' : '作成する' }}
-                        </button>
-                    </form>
-                </div>
-                <div *ngIf="loading">Loading groups...</div>
+                
+                <!-- グループ選択 -->
+                <div *ngIf="loading" class="loading">Loading groups...</div>
                 <div *ngIf="error" class="error-message">{{ error }}</div>
                 <div class="select" *ngIf="!loading && !error">
                     <select [(ngModel)]="selectedGroupId" (change)="onGroupChange($event)">
@@ -59,167 +28,219 @@
                     </select>
                 </div>
 
-                <!-- PinType一覧セクション -->
-                <div class="pintypes-section" *ngIf="selectedGroupId && selectedGroupId !== ''">
-                    <h3>PinType一覧</h3>
-                    <div *ngIf="pinTypesLoading" class="loading">Loading PinTypes...</div>
-                    <div *ngIf="pinTypesError" class="error-message">{{ pinTypesError }}</div>
-                    <div *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length === 0" class="no-pintypes">
-                        PinTypeがありません
-                    </div>
-                    <div class="pintypes-list" *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length > 0">
-                        <div class="pintype-item" *ngFor="let pt of pinTypes">
-                            <div>
-                                <div class="pintype-name">{{ pt.pin_type_name }}</div>
-                                <div class="pintype-desc">{{ pt.pin_type_description }}</div>
-                            </div>
-                            <div class="icon-wrapper">
-                                <a class="icon-button"><mat-icon>open_in_new</mat-icon></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="add-pintype-wrapper">
-                        <button type="button" (click)="toggleAddPinTypeForm()">
-                            <mat-icon>{{ showAddPinTypeForm ? 'remove' : 'add' }}</mat-icon>
-                            <span>{{ showAddPinTypeForm ? 'キャンセル' : '種類を追加' }}</span>
-                        </button>
-                        <form *ngIf="showAddPinTypeForm" (ngSubmit)="createPinType()">
+                <!-- グループ作成 -->
+                <div class="section-card">
+                    <button type="button" class="section-toggle" (click)="toggleAddGroupForm()">
+                        <mat-icon>{{ showAddGroupForm ? 'remove' : 'add' }}</mat-icon>
+                        <span>新しいグループを作成</span>
+                    </button>
+                    <div class="section-content" *ngIf="showAddGroupForm">
+                        <form (ngSubmit)="createGroup()">
                             <label>
-                                名称
-                                <input type="text" [(ngModel)]="newPinType.pin_type_name" name="pin_type_name"
-                                    required />
+                                グループ名
+                                <input type="text" [(ngModel)]="newGroup.group_name" name="group_name" required />
                             </label>
                             <label>
                                 説明
-                                <textarea [(ngModel)]="newPinType.pin_type_description" name="pin_type_description"
-                                    rows="2" required></textarea>
+                                <textarea [(ngModel)]="newGroup.group_description" name="group_description" rows="2"
+                                    required></textarea>
                             </label>
-                            <div class="feedback" *ngIf="addPinTypeError">{{ addPinTypeError }}</div>
-                            <div class="feedback success" *ngIf="addPinTypeSuccess">{{ addPinTypeSuccess }}</div>
-                            <button type="submit" [disabled]="addPinTypeLoading">
-                                {{ addPinTypeLoading ? '送信中...' : '追加する' }}
+                            <p class="current-user" *ngIf="currentUserId; else loadingUserId">
+                                あなたのユーザーID: <span>{{ currentUserId }}</span>
+                            </p>
+                            <ng-template #loadingUserId>
+                                <p class="current-user muted">ユーザーIDを取得中...</p>
+                            </ng-template>
+                            <p class="note">自分のIDは自動的に追加されます。</p>
+                            <label>
+                                追加のメンバーID（カンマ区切り・任意）
+                                <input type="text" [(ngModel)]="newGroup.user_ids" name="user_ids"
+                                    placeholder="例: member-id-1,member-id-2" />
+                            </label>
+                            <div class="feedback error" *ngIf="addGroupError">{{ addGroupError }}</div>
+                            <div class="feedback success" *ngIf="addGroupSuccess">{{ addGroupSuccess }}</div>
+                            <button type="submit" class="btn-primary" [disabled]="addGroupLoading">
+                                {{ addGroupLoading ? '送信中...' : '作成する' }}
                             </button>
                         </form>
                     </div>
                 </div>
 
-                <!-- メンバー一覧セクション -->
-                <div class="members-section" *ngIf="selectedGroupId && selectedGroupId !== ''">
-                    <h3>メンバー一覧</h3>
-                    <div *ngIf="membersLoading" class="loading">Loading members...</div>
-                    <div *ngIf="membersError" class="error-message">{{ membersError }}</div>
-                    <div *ngIf="!membersLoading && !membersError && members.length === 0" class="no-members">
-                        メンバーがいません
-                    </div>
-                    <div class="members-list" *ngIf="!membersLoading && !membersError && members.length > 0">
-                        <div class="member-item" *ngFor="let member of members">
-                            <div *ngIf="editingMember?.group_member_id !== member.group_member_id" class="member-view">
-                                <div class="member-info">
-                                    <div class="member-name">{{ member.user.user_name }}</div>
-                                    <div class="member-email">{{ member.user.user_email }}</div>
-                                    <div class="member-badges">
-                                        <span class="badge admin" *ngIf="member.admin">管理者</span>
-                                        <span class="badge blocked" *ngIf="member.not_allowed">ブロック中</span>
-                                    </div>
-                                </div>
-                                <div class="member-actions">
-                                    <button type="button" class="icon-button" (click)="editMember(member)">
-                                        <mat-icon>edit</mat-icon>
-                                    </button>
-                                    <button type="button" class="icon-button delete" (click)="deleteMember(member)">
-                                        <mat-icon>delete</mat-icon>
-                                    </button>
-                                </div>
+                <!-- グループ管理セクション（折りたたみ可能） -->
+                <div class="section-card" *ngIf="selectedGroupId && selectedGroupId !== ''">
+                    <button type="button" class="section-toggle" (click)="toggleGroupManagement()">
+                        <mat-icon>{{ showGroupManagement ? 'expand_less' : 'expand_more' }}</mat-icon>
+                        <span>グループ管理</span>
+                    </button>
+
+                    <div class="section-content" *ngIf="showGroupManagement">
+                        <!-- PinType一覧セクション -->
+                        <div class="subsection">
+                            <h3>PinType一覧</h3>
+                            <div *ngIf="pinTypesLoading" class="loading">Loading PinTypes...</div>
+                            <div *ngIf="pinTypesError" class="error-message">{{ pinTypesError }}</div>
+                            <div *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length === 0" class="empty-state">
+                                PinTypeがありません
                             </div>
-                            <div *ngIf="editingMember?.group_member_id === member.group_member_id && editingMember"
-                                class="member-edit">
-                                <div class="member-info">
-                                    <div class="member-name">{{ editingMember!.user.user_name }}</div>
-                                    <div class="member-email">{{ editingMember!.user.user_email }}</div>
-                                </div>
-                                <div class="edit-form">
-                                    <label>
-                                        <input type="checkbox" [(ngModel)]="editingMember!.admin"
-                                            name="admin_{{member.group_member_id}}" />
-                                        管理者
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" [(ngModel)]="editingMember!.not_allowed"
-                                            name="not_allowed_{{member.group_member_id}}" />
-                                        ブロック
-                                    </label>
-                                    <div class="feedback" *ngIf="editMemberError">{{ editMemberError }}</div>
-                                    <div class="edit-actions">
-                                        <button type="button" class="save-btn" (click)="updateMember(editingMember!)"
-                                            [disabled]="editMemberLoading">
-                                            {{ editMemberLoading ? '保存中...' : '保存' }}
-                                        </button>
-                                        <button type="button" class="cancel-btn" (click)="cancelEditMember()">
-                                            キャンセル
+                            <div class="item-list" *ngIf="!pinTypesLoading && !pinTypesError && pinTypes.length > 0">
+                                <div class="list-item" *ngFor="let pt of pinTypes">
+                                    <div class="item-content">
+                                        <div class="item-title">{{ pt.pin_type_name }}</div>
+                                        <div class="item-description">{{ pt.pin_type_description }}</div>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button type="button" class="icon-btn">
+                                            <mat-icon>open_in_new</mat-icon>
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="add-member-wrapper">
-                        <button type="button" (click)="toggleAddMemberForm()">
-                            <mat-icon>{{ showAddMemberForm ? 'remove' : 'add' }}</mat-icon>
-                            <span>{{ showAddMemberForm ? 'キャンセル' : 'メンバーを追加' }}</span>
-                        </button>
-                        <form *ngIf="showAddMemberForm" (ngSubmit)="addMember()">
-                            <label>
-                                ユーザーID（カンマ区切り）
-                                <input type="text" [(ngModel)]="newMember.user_ids" name="user_ids"
-                                    placeholder="例: user-id-1,user-id-2" required />
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" [(ngModel)]="newMember.admin" name="admin" />
-                                管理者権限を付与
-                            </label>
-                            <div class="feedback" *ngIf="addMemberError">{{ addMemberError }}</div>
-                            <div class="feedback success" *ngIf="addMemberSuccess">{{ addMemberSuccess }}</div>
-                            <button type="submit" [disabled]="addMemberLoading">
-                                {{ addMemberLoading ? '送信中...' : '追加する' }}
+                            <button type="button" class="add-btn" (click)="toggleAddPinTypeForm()">
+                                <mat-icon>{{ showAddPinTypeForm ? 'remove' : 'add' }}</mat-icon>
+                                <span>{{ showAddPinTypeForm ? 'キャンセル' : '種類を追加' }}</span>
                             </button>
-                        </form>
+                            <form class="add-form" *ngIf="showAddPinTypeForm" (ngSubmit)="createPinType()">
+                                <label>
+                                    名称
+                                    <input type="text" [(ngModel)]="newPinType.pin_type_name" name="pin_type_name"
+                                        required />
+                                </label>
+                                <label>
+                                    説明
+                                    <textarea [(ngModel)]="newPinType.pin_type_description" name="pin_type_description"
+                                        rows="2" required></textarea>
+                                </label>
+                                <div class="feedback error" *ngIf="addPinTypeError">{{ addPinTypeError }}</div>
+                                <div class="feedback success" *ngIf="addPinTypeSuccess">{{ addPinTypeSuccess }}</div>
+                                <button type="submit" class="btn-primary" [disabled]="addPinTypeLoading">
+                                    {{ addPinTypeLoading ? '送信中...' : '追加する' }}
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- メンバー一覧セクション -->
+                        <div class="subsection">
+                            <h3>メンバー一覧</h3>
+                            <div *ngIf="membersLoading" class="loading">Loading members...</div>
+                            <div *ngIf="membersError" class="error-message">{{ membersError }}</div>
+                            <div *ngIf="!membersLoading && !membersError && members.length === 0" class="empty-state">
+                                メンバーがいません
+                            </div>
+                            <div class="item-list" *ngIf="!membersLoading && !membersError && members.length > 0">
+                                <div class="list-item" *ngFor="let member of members">
+                                    <div *ngIf="editingMember?.group_member_id !== member.group_member_id" class="item-view">
+                                        <div class="item-content">
+                                            <div class="item-title">{{ member.user.user_name }}</div>
+                                            <div class="item-description">{{ member.user.user_email }}</div>
+                                            <div class="item-badges">
+                                                <span class="badge admin" *ngIf="member.admin">管理者</span>
+                                                <span class="badge blocked" *ngIf="member.not_allowed">ブロック中</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-actions">
+                                            <button type="button" class="icon-btn" (click)="editMember(member)">
+                                                <mat-icon>edit</mat-icon>
+                                            </button>
+                                            <button type="button" class="icon-btn delete" (click)="deleteMember(member)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="editingMember?.group_member_id === member.group_member_id && editingMember"
+                                        class="item-edit">
+                                        <div class="item-content">
+                                            <div class="item-title">{{ editingMember!.user.user_name }}</div>
+                                            <div class="item-description">{{ editingMember!.user.user_email }}</div>
+                                        </div>
+                                        <form class="edit-form">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" [(ngModel)]="editingMember!.admin"
+                                                    name="admin_{{member.group_member_id}}" />
+                                                管理者
+                                            </label>
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" [(ngModel)]="editingMember!.not_allowed"
+                                                    name="not_allowed_{{member.group_member_id}}" />
+                                                ブロック
+                                            </label>
+                                            <div class="feedback error" *ngIf="editMemberError">{{ editMemberError }}</div>
+                                            <div class="form-actions">
+                                                <button type="button" class="btn-primary" (click)="updateMember(editingMember!)"
+                                                    [disabled]="editMemberLoading">
+                                                    {{ editMemberLoading ? '保存中...' : '保存' }}
+                                                </button>
+                                                <button type="button" class="btn-secondary" (click)="cancelEditMember()">
+                                                    キャンセル
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="add-btn" (click)="toggleAddMemberForm()">
+                                <mat-icon>{{ showAddMemberForm ? 'remove' : 'add' }}</mat-icon>
+                                <span>{{ showAddMemberForm ? 'キャンセル' : 'メンバーを追加' }}</span>
+                            </button>
+                            <form class="add-form" *ngIf="showAddMemberForm" (ngSubmit)="addMember()">
+                                <label>
+                                    ユーザーID（カンマ区切り）
+                                    <input type="text" [(ngModel)]="newMember.user_ids" name="user_ids"
+                                        placeholder="例: user-id-1,user-id-2" required />
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" [(ngModel)]="newMember.admin" name="admin" />
+                                    管理者権限を付与
+                                </label>
+                                <div class="feedback error" *ngIf="addMemberError">{{ addMemberError }}</div>
+                                <div class="feedback success" *ngIf="addMemberSuccess">{{ addMemberSuccess }}</div>
+                                <button type="submit" class="btn-primary" [disabled]="addMemberLoading">
+                                    {{ addMemberLoading ? '送信中...' : '追加する' }}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
                 <!-- ピン一覧セクション -->
-                <div class="pins-section" *ngIf="selectedGroupId && selectedGroupId !== ''">
-                    <h3>ピン一覧</h3>
-                    <div *ngIf="pinsLoading" class="loading">Loading pins...</div>
-                    <div *ngIf="pinsError" class="error-message">{{ pinsError }}</div>
-                    <div *ngIf="!pinsLoading && !pinsError && pins.length === 0" class="no-pins">
-                        ピンがありません
-                    </div>
-                    <div class="pins-list" *ngIf="!pinsLoading && !pinsError && pins.length > 0">
-                        <div class="pin-item" *ngFor="let pin of pins" (click)="onPinClick(pin)">
-                            <div>
-                                <div class="pin-name">{{ pin.pin_name }}</div>
-                                <div class="pin-type">{{ pin.pin_type.pin_type_name }}</div>
-                                <div class="pin-location">{{ pin.latitude }}, {{ pin.longitude }}</div>
-                            </div>
-                            <div class="icon-wrapper">
-                                <a class="icon-button"><mat-icon>open_in_new</mat-icon></a>
+                <div class="section-card" *ngIf="selectedGroupId && selectedGroupId !== ''">
+                    <button type="button" class="section-toggle" (click)="togglePinList()">
+                        <mat-icon>{{ showPinList ? 'expand_less' : 'expand_more' }}</mat-icon>
+                        <span>ピン一覧</span>
+                    </button>
+                    <div class="section-content" *ngIf="showPinList">
+                        <div *ngIf="pinsLoading" class="loading">Loading pins...</div>
+                        <div *ngIf="pinsError" class="error-message">{{ pinsError }}</div>
+                        <div *ngIf="!pinsLoading && !pinsError && pins.length === 0" class="empty-state">
+                            ピンがありません
+                        </div>
+                        <div class="item-list" *ngIf="!pinsLoading && !pinsError && pins.length > 0">
+                            <div class="list-item clickable" *ngFor="let pin of pins" (click)="onPinClick(pin)">
+                                <div class="item-content">
+                                    <div class="item-title">{{ pin.pin_name }}</div>
+                                    <div class="item-meta">{{ pin.pin_type.pin_type_name }}</div>
+                                    <div class="item-description">{{ pin.latitude }}, {{ pin.longitude }}</div>
+                                </div>
+                                <div class="item-actions">
+                                    <button type="button" class="icon-btn">
+                                        <mat-icon>open_in_new</mat-icon>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="add-pin-wrapper">
-                        <button type="button" (click)="toggleAddPinForm()">
+                        <button type="button" class="add-btn" (click)="toggleAddPinForm()">
                             <mat-icon>{{ showAddPinForm ? 'remove' : 'add' }}</mat-icon>
                             <span>{{ showAddPinForm ? 'キャンセル' : 'ピンを追加' }}</span>
                         </button>
-                        <form *ngIf="showAddPinForm" (ngSubmit)="createPin()">
-                            <div class="map-selection-info">
-                                <span>マップをクリックすると座標が自動入力されます。</span>
-                                <button type="button" class="clear-selection" (click)="clearSelectedCoordinates()"
+                        <form class="add-form" *ngIf="showAddPinForm" (ngSubmit)="createPin()">
+                            <div class="info-message">
+                                <mat-icon>info</mat-icon>
+                                <span>マップをクリックすると座標が自動入力されます</span>
+                                <button type="button" class="btn-text" (click)="clearSelectedCoordinates()"
                                     *ngIf="newPin.latitude && newPin.longitude">
-                                    選択をクリア
+                                    クリア
                                 </button>
                             </div>
-                            <div class="selected-coordinates" *ngIf="newPin.latitude && newPin.longitude">
+                            <div class="selected-info" *ngIf="newPin.latitude && newPin.longitude">
                                 選択中: {{ newPin.latitude }}, {{ newPin.longitude }}
                             </div>
                             <label>
@@ -235,7 +256,7 @@
                                 ピン名
                                 <input type="text" [(ngModel)]="newPin.pin_name" name="pin_name" required />
                             </label>
-                            <div class="latlng">
+                            <div class="form-row">
                                 <label>
                                     緯度
                                     <input type="text" [(ngModel)]="newPin.latitude" name="latitude" required />
@@ -245,9 +266,9 @@
                                     <input type="text" [(ngModel)]="newPin.longitude" name="longitude" required />
                                 </label>
                             </div>
-                            <div class="feedback" *ngIf="addPinError">{{ addPinError }}</div>
+                            <div class="feedback error" *ngIf="addPinError">{{ addPinError }}</div>
                             <div class="feedback success" *ngIf="addPinSuccess">{{ addPinSuccess }}</div>
-                            <button type="submit" [disabled]="addPinLoading">
+                            <button type="submit" class="btn-primary" [disabled]="addPinLoading">
                                 {{ addPinLoading ? '送信中...' : '追加する' }}
                             </button>
                         </form>

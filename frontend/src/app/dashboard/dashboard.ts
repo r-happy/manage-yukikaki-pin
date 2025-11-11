@@ -93,6 +93,8 @@ export class Dashboard implements OnInit, OnDestroy {
   editingMember: GroupMember | null = null;
   editMemberLoading = false;
   editMemberError: string | null = null;
+  showGroupManagement = false;
+  showPinList = true;
   private coordinateSubscription?: Subscription;
 
   togglePanel() {
@@ -104,6 +106,14 @@ export class Dashboard implements OnInit, OnDestroy {
     if (!this.showAddGroupForm) {
       this.resetAddGroupFeedback();
     }
+  }
+
+  toggleGroupManagement() {
+    this.showGroupManagement = !this.showGroupManagement;
+  }
+
+  togglePinList() {
+    this.showPinList = !this.showPinList;
   }
 
   private resetAddGroupFeedback() {
