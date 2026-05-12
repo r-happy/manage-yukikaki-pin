@@ -5,8 +5,6 @@ services:
     container_name: manage-yukikaki-backend
     environment:
       SECRET_KEY: ${SECRET_KEY:-devsecret}
-    ports:
-      - "1323:1323"
     volumes:
       - /opt/manage-yukikaki/db:/app/db
     # volumes:
@@ -23,8 +21,6 @@ services:
       - backend
     environment:
       BACKEND_URL: ${FRONTEND_BACKEND_URL:-http://localhost:1323}
-    ports:
-      - "8080:4200"
     restart: unless-stopped
     networks:
       - manage-yukikaki-net
