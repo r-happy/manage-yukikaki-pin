@@ -20,7 +20,7 @@ services:
     depends_on:
       - backend
     environment:
-      BACKEND_URL: ${FRONTEND_BACKEND_URL:-http://localhost:1323}
+      BACKEND_URL: ${FRONTEND_BACKEND_URL:-http://backend:1323}
     restart: unless-stopped
     networks:
       - manage-yukikaki-net

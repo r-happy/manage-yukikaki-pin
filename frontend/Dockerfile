@@ -1,17 +1,30 @@
 # syntax=docker/dockerfile:1
 
-FROM node:20-bookworm
+FROM node:20-bookworm AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 
-EXPOSE 4200
-
 ENV NG_CLI_ANALYTICS="false"
-ENV BACKEND_URL="http://localhost:1323"
+RUN npm run build -- --configuration production
 
-CMD ["npm", "run", "start", "--", "--host", "0.0.0.0", "--port", "4200"]
+FROM node:20-bookworm-slim AS runner
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/dist ./dist
+
+ENV NODE_ENV="production"
+ENV PORT="4000"
+ENV BACKEND_URL="http://backend:1323"
+
+EXPOSE 4000
+
+CMD ["node", "dist/frontend/server/server.mjs"]
