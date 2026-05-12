@@ -6,6 +6,7 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { Readable } from 'node:stream';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 const backendUrl = process.env['BACKEND_URL'] || 'http://backend:1323';
@@ -44,7 +45,7 @@ app.use(async (req, res, next) => {
   };
 
   if (req.method !== 'GET' && req.method !== 'HEAD') {
-    requestInit.body = req;
+    requestInit.body = Readable.toWeb(req) as BodyInit;
     requestInit.duplex = 'half';
   }
 
