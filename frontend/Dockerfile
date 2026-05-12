@@ -12,19 +12,9 @@ COPY . .
 ENV NG_CLI_ANALYTICS="false"
 RUN npm run build -- --configuration production
 
-FROM node:20-bookworm-slim AS runner
+FROM nginx:1.27-alpine
 
-WORKDIR /app
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html
 
-COPY package*.json ./
-RUN npm ci --omit=dev
-
-COPY --from=builder /app/dist ./dist
-
-ENV NODE_ENV="production"
-ENV PORT="4000"
-ENV BACKEND_URL="http://backend:1323"
-
-EXPOSE 4000
-
-CMD ["node", "dist/frontend/server/server.mjs"]
+EXPOSE 80

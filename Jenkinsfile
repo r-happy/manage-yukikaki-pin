@@ -4,7 +4,6 @@ pipeline {
     environment {
         // Set timezone for logs if desired
         TZ = 'Asia/Tokyo'
-        DEFAULT_FRONTEND_BACKEND_URL = 'http://backend:1323'
     }
 
     stages {
@@ -41,17 +40,7 @@ pipeline {
                 withCredentials([
                     string(credentialsId: 'BACKEND_SECRET_KEY', variable: 'SECRET_KEY')
                 ]) {
-                    script {
-                        def targetBackendUrl = env.FRONTEND_BACKEND_URL?.trim()
-                        if (!targetBackendUrl) {
-                            targetBackendUrl = env.DEFAULT_FRONTEND_BACKEND_URL
-                        }
-
-                        sh """
-                            export FRONTEND_BACKEND_URL='${targetBackendUrl}'
-                            docker compose up -d --remove-orphans
-                        """
-                    }
+                    sh 'docker compose up -d --remove-orphans'
                 }
             }
         }
