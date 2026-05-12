@@ -8,9 +8,71 @@ import express from 'express';
 import { join } from 'node:path';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
+const backendUrl = process.env['BACKEND_URL'] || 'http://backend:1323';
+const proxiedPathPrefixes = ['/signin', '/signup', '/public', '/api'];
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+app.use(async (req, res, next) => {
+  if (!proxiedPathPrefixes.some((prefix) => req.path.startsWith(prefix))) {
+    next();
+    return;
+  }
+
+  const targetUrl = new URL(req.originalUrl, backendUrl);
+  const headers = new Headers();
+
+  for (const [key, value] of Object.entries(req.headers)) {
+    if (!value || key.toLowerCase() === 'host') {
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        headers.append(key, entry);
+      }
+      continue;
+    }
+
+    headers.set(key, value);
+  }
+
+  const requestInit: RequestInit & { duplex?: 'half' } = {
+    method: req.method,
+    headers,
+  };
+
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    requestInit.body = req;
+    requestInit.duplex = 'half';
+  }
+
+  try {
+    const response = await fetch(targetUrl, requestInit);
+
+    res.status(response.status);
+
+    response.headers.forEach((value, key) => {
+      if (key.toLowerCase() === 'transfer-encoding') {
+        return;
+      }
+      res.setHeader(key, value);
+    });
+
+    if (!response.body) {
+      res.end();
+      return;
+    }
+
+    for await (const chunk of response.body) {
+      res.write(chunk);
+    }
+    res.end();
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * Example Express Rest API endpoints can be defined here.

@@ -4,7 +4,7 @@ pipeline {
     environment {
         // Set timezone for logs if desired
         TZ = 'Asia/Tokyo'
-        DEFAULT_FRONTEND_BACKEND_URL = 'http://localhost:1323'
+        DEFAULT_FRONTEND_BACKEND_URL = 'http://backend:1323'
     }
 
     stages {
