@@ -161,6 +161,11 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
 
     this.updateMap();
 
+    // The map is rendered inside a routed layout, so size can be wrong on first paint.
+    queueMicrotask(() => this.map?.invalidateSize());
+    setTimeout(() => this.map?.invalidateSize(), 0);
+    setTimeout(() => this.map?.invalidateSize(), 200);
+
     if (this.pendingSelection) {
       this.setSelectionMarker(
         this.pendingSelection.lat,
