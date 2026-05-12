@@ -26,9 +26,25 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "marker-icon.png",
+                "input": "node_modules/leaflet/dist/images",
+                "output": "assets"
+              },
+              {
+                "glob": "marker-icon-2x.png",
+                "input": "node_modules/leaflet/dist/images",
+                "output": "assets"
+              },
+              {
+                "glob": "marker-shadow.png",
+                "input": "node_modules/leaflet/dist/images",
+                "output": "assets"
               }
             ],
             "styles": [
+              "node_modules/leaflet/dist/leaflet.css",
               "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.scss"
             ]
@@ -88,9 +104,25 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "marker-icon.png",
+                "input": "node_modules/leaflet/dist/images",
+                "output": "assets"
+              },
+              {
+                "glob": "marker-icon-2x.png",
+                "input": "node_modules/leaflet/dist/images",
+                "output": "assets"
+              },
+              {
+                "glob": "marker-shadow.png",
+                "input": "node_modules/leaflet/dist/images",
+                "output": "assets"
               }
             ],
             "styles": [
+              "node_modules/leaflet/dist/leaflet.css",
               "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.scss"
             ]
